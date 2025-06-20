@@ -1,0 +1,223 @@
+/* Custom fixes for login page text boxes */
+.feature-text-box {
+    padding: 7px 10px;
+    margin-top: 6px;
+    font-size: 10px;
+    line-height: 1.2;
+    max-width: 100%;
+    margin-bottom: 6px;
+    max-height: none;
+    overflow: visible;
+    text-overflow: initial;
+    display: block;
+    -webkit-line-clamp: initial;
+    line-clamp: initial;
+    -webkit-box-orient: initial;
+    box-orient: initial;
+    border-radius: 8px; /* Ensure text boxes don't have unnecessary constraints */
+}
+
+.register-feature {
+    padding: 12px;
+    margin-bottom: 16px;
+    max-height: none;
+    height: auto;
+    overflow: visible;
+    border-radius: 12px;
+    transition: transform 0.2s ease;
+}
+
+.register-feature .feature-circle {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.feature-desc {
+    font-size: 13px;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    max-width: 95%;
+}
+
+/* Improve feature descriptions spacing */
+.feature-highlight-box p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.2;
+}
+
+/* Make feature content more condensed */
+.register-feature:nth-child(2) .feature-desc,
+.register-feature:nth-child(3) .feature-desc,
+.register-feature:nth-child(4) .feature-desc {
+    font-size: 11px;
+    white-space: normal;
+    display: block;
+    overflow: visible;
+    text-overflow: initial;
+}
+
+.registration-content h3 {
+    font-size: 20px;
+    margin-bottom: 16px;
+}
+
+/* Make the feature highlight box properly sized */
+.feature-highlight-box {
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    font-size: 13px;
+}
+
+/* Additional fixes to prevent text cutoff */
+.registration-left {
+    padding: 24px;
+    width: 50%; /* Increase the width from 45% to 50% */
+}
+
+/* Adjust right side to balance the layout */
+.registration-right {
+    width: 50%;
+}
+
+/* Make registration content more compact */
+.registration-content {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+}
+
+/* Remove scrolling for feature list */
+.feature-list {
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+}
+
+/* Make testimonial box smaller */
+.testimonial-box {
+    padding: 10px;
+    margin-top: 10px;
+}
+
+/* Ensure brand logo is not too large */
+.brand-logo h2 {
+    font-size: 20px;
+}
+
+.terminal-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+}
+
+/* Adjust feature containers to prevent overlapping */
+.feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+/* Further reduce size of feature descriptions for large screen text */
+.register-feature .feature-desc {
+    max-height: 30px;
+}
+
+/* Ensure the left side content has proper spacing */
+.registration-left .brand-logo {
+    margin-bottom: 10px;
+}
+
+/* Adjust font sizes for feature text */
+.feature-highlight-box p {
+    font-size: 13px;
+    line-height: 1.3;
+}
+
+/* Improve feature descriptions spacing */
+.register-feature:nth-child(2) .feature-desc,
+.register-feature:nth-child(3) .feature-desc,
+.register-feature:nth-child(4) .feature-desc {
+    font-size: 12px;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}
+
+/* Make testimonial content larger */
+.testimonial-content h4 {
+    font-size: 15px;
+}
+
+.testimonial-content .testimonial-role {
+    font-size: 12px;
+}
+
+.testimonial-content .testimonial-quote {
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* Remove custom scrollbar styles */
+
+/* Ensure the content container has proper height */
+.registration-container {
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Adjust left side to match system access part */
+.registration-left {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 40px;
+}
+
+/* Reset any height limitations on features */
+.register-feature:nth-child(1),
+.register-feature:nth-child(2),
+.register-feature:nth-child(3),
+.register-feature:nth-child(4) {
+    height: auto;
+    max-height: none;
+}
+
+/* Ensure testimonial doesn't get cut off */
+.testimonial-box {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Add a bit more breathing room at the bottom */
+.registration-content {
+    padding-bottom: 20px;
+}
+
+/* Ensure feature text wrapping */
+.feature-desc,
+.feature-text-box {
+    word-wrap: break-word;
+    word-break: normal;
+    hyphens: auto;
+}
+
+/* Mobile optimizations */
+@media (max-width: 992px) {
+    .registration-left {
+        padding: 15px;
+    }
+    
+    .register-feature {
+        max-height: none;
+    }
+    
+    .feature-text-box {
+        max-height: none;
+    }
+}

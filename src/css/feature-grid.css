@@ -1,0 +1,26 @@
+.feature-arrow {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: auto;
+    color: var(--text-tertiary);
+    font-size: 1rem;
+    transition: var(--transition-normal);
+}
+
+.feature-item:hover .feature-arrow {
+    color: var(--primary);
+    transform: translateX(5px);
+}
+
+@media (max-width: 992px) {
+    .feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .feature-grid {
+        grid-template-columns: 1fr;
+    }
+}
