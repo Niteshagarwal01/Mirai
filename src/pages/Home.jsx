@@ -1,22 +1,16 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import Navbar from './components/navbar'
-import Footer from './components/footer'
-import BlackModernWorldNoTobaccoDayInstagramPost from './assets/Black Modern World No Tobacco Day Instagram Post  (1).png'
-import googleLogo from './assets/google-logo.svg'
-import image from './assets/image.png'
-import reactSvg from './assets/react.svg'
+import Navbar from '../components/navbar'
+import Footer from '../components/footer'
+import BlackModernWorldNoTobaccoDayInstagramPost from '../assets/Black Modern World No Tobacco Day Instagram Post  (1).png'
+import googleLogo from '../assets/google-logo.svg'
+import image from '../assets/image.png'
+import reactSvg from '../assets/react.svg'
 
 const Home = () => {
     return (
     <div className="home">
     <Navbar/>
-    
-        {/* //Fixed Fluid Elements */}
-    <div className="fluid-element" id="fluid1"></div>
-    <div className="fluid-element" id="fluid2"></div>
-    <div className="fluid-element" id="fluid3"></div>   
-    
     
       {/* //-- Hero Section -- */}
     <section id="home" className="hero">
@@ -33,10 +27,9 @@ const Home = () => {
                     </div>
                 </div>
                 <h1>Transform Your <span className="gradient-text">Marketing</span> with AI Precision</h1>
-                <p className="hero-subtitle">Mirai automates your entire marketing workflow with AI, from content creation to customer engagement, saving 80% of your time and resources.</p>
-                <div className="hero-buttons">
-                    <a href="pages/login.html" className="btn-primary">Get Started Free <i className="fas fa-arrow-right"></i></a>
-                    <a href="#" className="btn-secondary">Book a Demo</a>
+                <p className="hero-subtitle">Mirai automates your entire marketing workflow with AI, from content creation to customer engagement, saving 80% of your time and resources.</p>                <div className="hero-buttons">
+                    <Link to="/login" className="btn-primary">Get Started Free <i className="fas fa-arrow-right"></i></Link>
+                    <a href="#demo" className="btn-secondary">Book a Demo</a>
                 </div>
                 <div className="hero-testimonial">
                     <div className="testimonial-stars">
@@ -180,8 +173,7 @@ const Home = () => {
                             <li><i className="fas fa-check"></i> Content generation (10 pieces/month)</li>
                             <li><i className="fas fa-check"></i> Essential analytics dashboard</li>
                         </ul>
-                    </div>
-                    <a href="pages/login.html" className="btn-primary">Get Started</a>
+                    </div>                    <Link to="/login" className="btn-primary">Get Started</Link>
                 </div>
                 <div className="pricing-card featured">
                     <div className="popular-tag">Most Popular</div>
@@ -198,7 +190,7 @@ const Home = () => {
                             <li><i className="fas fa-check"></i> Enhanced analytics with reporting</li>
                             <li><i className="fas fa-check"></i> 3D model generation (10/month)</li>
                         </ul>                    </div>
-                    <a href="pages/login.html" className="btn-primary">Get Started</a>
+                    <Link to="/login" className="btn-primary">Get Started</Link>
                 </div>
                 <div className="pricing-card">
                     <div className="pricing-header">
@@ -217,7 +209,7 @@ const Home = () => {
                             <li><i className="fas fa-check"></i> API access for custom integrations</li>
                         </ul>
                     </div>
-                    <a href="pages/login.html" className="btn-primary">Get Started</a>
+                    <Link to="/login" className="btn-primary">Get Started</Link>
                 </div>
             </div>
         </div>
@@ -294,7 +286,7 @@ const Home = () => {
         <div className="container">
             <div className="cta-content">
                 <h2>Ready to Transform Your Marketing?</h2>
-                <p>Start your 14-day free trial today. No credit card required.</p>                <div className="cta-buttons">                    <a href="pages/login.html" className="btn-primary">Get Started Free</a>
+                <p>Start your 14-day free trial today. No credit card required.</p>                <div className="cta-buttons">                    <Link to="/login" className="btn-primary">Get Started Free</Link>
                     <a href="#demo" className="btn-secondary">Book a Demo</a>
                 </div>
             </div>
