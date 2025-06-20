@@ -4,7 +4,8 @@ Transform your marketing with AI precision. Mirai automates your entire marketin
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Prerequisites\
+dnds
 
 Before you begin, ensure you have the following installed:
 - [Node.js](https://nodejs.org/) (version 16.0 or higher)
