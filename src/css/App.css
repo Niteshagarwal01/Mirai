@@ -37,6 +37,147 @@
     --transition-slow: 0.5s ease;
 }
 
+/* Prototype Note Box */
+.prototype-note {
+    background: rgba(255, 190, 61, 0.15);
+    border-left: 4px solid var(--warning);
+    padding: 15px 20px;
+    margin: 0 auto;
+    border-radius: 8px;
+    max-width: 1200px;
+    color: var(--text-main);
+    position: fixed;
+    box-shadow: var(--shadow-sm);
+    z-index: 1001;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.5s ease-in-out;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.prototype-note-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+}
+
+.prototype-note .close-note {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    height: 28px;
+    width: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.prototype-note .close-note:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--warning);
+}
+
+.prototype-note i {
+    font-size: 24px;
+    color: var(--warning);
+}
+
+.prototype-note-text {
+    flex: 1;
+}
+
+.prototype-note-text h4 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: var(--warning);
+}
+
+.prototype-note-text p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+    padding-right: 30px;
+}
+
+.prototype-note-text a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.prototype-note-text a:hover {
+    text-decoration: underline;
+}
+
+/* Media query for responsive prototype notification */
+@media (max-width: 768px) {
+    .prototype-note {
+        width: 95%;
+        padding: 12px 15px;
+    }
+    
+    .prototype-note i {
+        font-size: 20px;
+    }
+    
+    .prototype-note-text h4 {
+        font-size: 0.95rem;
+    }
+    
+    .prototype-note-text p {
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .prototype-note-content {
+        gap: 10px;
+    }
+    
+    .prototype-note i {
+        font-size: 18px;
+    }
+    
+    .prototype-note-text p {
+        padding-right: 20px;
+    }
+}
+
+/* Reset notification button */
+.reset-notification {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.reset-notification:hover {
+    opacity: 1;
+}
+
 * {
     margin: 0;
     padding: 0;

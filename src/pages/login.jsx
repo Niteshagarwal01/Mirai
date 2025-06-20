@@ -2,6 +2,13 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { userService } from '../services/userService'
 
+/**
+ * Login component with special admin bypass functionality
+ * Admin can log in with credentials:
+ * - Email: admin or Nitesh
+ * - Password: admin123 or password
+ * This bypasses MongoDB connection issues for judges/demo purposes
+ */
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -24,24 +31,55 @@ const Login = () => {
     setLoading(true);
     setError('');
     
+    // ===== ADMIN BYPASS LOGIC =====
+    // Check for any combination of admin credentials
+    const isAdminEmail = formData.email === 'admin@mirai.com' || 
+                        formData.email === 'admin' || 
+                        formData.email === 'Nitesh';
+    
+    const isAdminPassword = formData.password === 'Admin@123' || 
+                           formData.password === 'admin123' || 
+                           formData.password === 'password';
+    
+    // If admin credentials, bypass MongoDB completely
+    if (isAdminEmail && isAdminPassword) {
+      console.log('Admin bypass login - skipping MongoDB');
+      
+      // Create local admin user object
+      const adminUser = {
+        name: 'Nitesh',
+        email: isAdminEmail ? formData.email : 'admin@mirai.com',
+        role: 'admin',
+        _id: 'admin-local-bypass-' + Date.now() // Add timestamp for uniqueness
+      };
+      
+      // Save admin user info to localStorage
+      localStorage.setItem('user', JSON.stringify(adminUser));
+      
+      // Small delay to simulate API call
+      setTimeout(() => {
+        setLoading(false);
+        navigate('/admin');
+      }, 500);
+      
+      return; // Exit early, no need to try the server
+    }
+    
+    // ===== REGULAR LOGIN LOGIC =====
     try {
-      // Special case for admin login (using the admin we created in MongoDB)
-      if (formData.email === 'admin' || formData.email === 'Nitesh') {
-        // Admin login using name
-        const response = await userService.login({
-          name: 'Nitesh'
-        });
-        
-        if (response.error) {
-          setError(response.error);
+      // Regular login flow with MongoDB
+      let response;
+      
+      try {
+        if (formData.email === 'admin' || formData.email === 'Nitesh') {
+          // Admin login using name
+          response = await userService.login({
+            name: 'Nitesh'
+          });
         } else {
-          // Save user info to localStorage
-          localStorage.setItem('user', JSON.stringify(response.user));
-          navigate('/admin');
+          // Regular user login flow
+          response = await userService.login(formData);
         }
-      } else {
-        // Regular login flow
-        const response = await userService.login(formData);
         
         if (response.error) {
           setError(response.error);
@@ -56,10 +94,44 @@ const Login = () => {
             navigate('/');
           }
         }
+      } catch (apiError) {
+        console.error('API error during login:', apiError);
+        
+        // Double-check for admin credentials as fallback
+        if (isAdminEmail && isAdminPassword) {
+          console.log('MongoDB failed, using admin bypass as fallback');
+          
+          // Create local admin user object as fallback
+          const adminUser = {
+            name: 'Nitesh',
+            email: isAdminEmail ? formData.email : 'admin@mirai.com',
+            role: 'admin',
+            _id: 'admin-local-bypass-' + Date.now() // Add timestamp for uniqueness
+          };
+          
+          // Save admin user info to localStorage
+          localStorage.setItem('user', JSON.stringify(adminUser));
+          
+          // Navigate after a small delay
+          setTimeout(() => {
+            navigate('/admin');
+          }, 100);
+          
+          return;
+        }
+        
+        // If we got here, it's a genuine error
+        throw apiError;
       }
     } catch (err) {
-      setError('Login failed. Please check your credentials and try again.');
-      console.error(err);
+      console.error('Login error:', err);
+      
+      // Special handling for network errors or MongoDB connection issues
+      if (err.name === 'TypeError' || err.message?.includes('network') || err.message?.includes('fetch')) {
+        setError('Network error or server unavailable. If you are an admin, try using admin@mirai.com and Admin@123.');
+      } else {
+        setError('Login failed. Please check your credentials and try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -114,6 +186,9 @@ const Login = () => {
             <div className="login-form-container">
                 <h2>System <span className="access-text">Access</span></h2>
                 <p className="login-subtitle">Sign in to your account to continue</p>
+                <div className="admin-login-hint">
+                  <i className="fas fa-info-circle"></i> For admin access: <strong>admin@mirai.com</strong> / <strong>Admin@123</strong>
+                </div>
                   <form className="login-form" onSubmit={handleSubmit}>
                     {error && <div className="error-message">{error}</div>}
                     

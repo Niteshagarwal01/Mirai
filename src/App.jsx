@@ -1,9 +1,10 @@
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
+import { Routes, Route, useLocation, Navigate, Outlet } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import Home from './pages/Home.jsx'
 import Login from './pages/login.jsx'
 import Signup from './pages/Signup.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
+import ContentGenerator from './pages/ContentGenerator.jsx'
 import './css/App.css'
 import './css/custom-login-fix.css'
 import './css/feature-detail.css'
@@ -13,6 +14,7 @@ import './css/onboarding.css'
 import './css/pricing-page.css'
 import './css/registration-styles.css'
 import './css/admin-dashboard.css'
+import './css/content-generator.css'
 import { initializeAnimations } from './components/script.js'
 
 // Protected route component
@@ -68,7 +70,14 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route 
               path="/admin" 
-              element={<ProtectedRoute element={<AdminDashboard />} allowedRoles={['admin']} />} 
+              element={<ProtectedRoute element={<AdminDashboard />} allowedRoles={['admin']} />}
+            >
+              <Route path="content" element={<ContentGenerator />} />
+            </Route>
+            {/* Keep this route for backward compatibility */}
+            <Route
+              path="/content-generator"
+              element={<Navigate to="/admin/content" replace />}
             />
           </Routes>
         </main>

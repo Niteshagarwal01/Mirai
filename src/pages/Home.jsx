@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../components/navbar'
 import Footer from '../components/footer'
@@ -8,9 +8,40 @@ import image from '../assets/image.png'
 import reactSvg from '../assets/react.svg'
 
 const Home = () => {
+    // State to control notification visibility
+    const [showNotification, setShowNotification] = useState(true);
+    
+    // Load visibility state from localStorage when component mounts
+    useEffect(() => {
+        const isHidden = localStorage.getItem('hidePrototypeNotification') === 'true';
+        setShowNotification(!isHidden);
+    }, []);
+    
+    // Function to hide notification and save state to localStorage
+    const hideNotification = () => {
+        setShowNotification(false);
+        localStorage.setItem('hidePrototypeNotification', 'true');
+    };
+    
     return (
     <div className="home">
     <Navbar/>
+    
+    {/* Prototype Notification Box */}
+    {showNotification && (
+        <div className="prototype-note">
+            <div className="prototype-note-content">
+                <i className="fas fa-info-circle"></i>
+                <div className="prototype-note-text">
+                    <h4>Prototype Access</h4>
+                    <p>For full feature access, <Link to="/login">log in</Link> with admin credentials (email: admin@mirai.com, password: Admin@123)</p>
+                </div>
+                <button className="close-note" onClick={hideNotification}>
+                    <i className="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    )}
     
       {/* //-- Hero Section -- */}
     <section id="home" className="hero">
@@ -120,7 +151,7 @@ const Home = () => {
                     </div>
                     <div className="feature-content">
                         <h3>Content Generation</h3>
-                        <p>Create blogs, social media posts, and email campaigns tailored to your brand voice in seconds.</p>
+                        <p>Create blogs, social media posts, and articles tailored to your brand voice in seconds.</p>
                     </div>
                     <div className="feature-arrow">
                         <i className="fas fa-arrow-right"></i>

@@ -547,6 +547,28 @@ body.auth-page::before {
     color: #6e40ff !important;
 }
 
+/* Admin login hint styles */
+.admin-login-hint {
+  background: rgba(110, 64, 255, 0.1);
+  border-left: 2px solid var(--primary);
+  padding: 8px 12px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-login-hint i {
+  color: var(--primary);
+}
+
+.admin-login-hint strong {
+  color: var(--text-main);
+}
+
 /* Responsive styles */
 @media (max-width: 992px) {
     .login-container {

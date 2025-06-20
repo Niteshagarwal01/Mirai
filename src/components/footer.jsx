@@ -1,6 +1,12 @@
 import React from 'react'
 
 const Footer = () => {
+  // Function to reset notification state
+  const resetNotification = () => {
+    localStorage.removeItem('hidePrototypeNotification');
+    window.location.reload();
+  };
+  
   return (
     <div>
       <footer>
@@ -16,12 +22,14 @@ const Footer = () => {
                             <button type="submit" className="btn-primary">Subscribe</button>
                         </div>
                     </div>
-                    <div class="social-icons">
+                    <div className="social-icons">
                         <a href="#" aria-label="Twitter"><i className="fab fa-twitter"></i></a>
                         <a href="#" aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>
                         <a href="#" aria-label="LinkedIn"><i className="fab fa-linkedin-in"></i></a>
                         <a href="#" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
                         <a href="#" aria-label="YouTube"><i className="fab fa-youtube"></i></a>
+                        {/* Hidden link to reset notification */}
+                        <a href="#" onClick={(e) => { e.preventDefault(); resetNotification(); }} title="Reset Prototype Notification" className="reset-notification" aria-label="Reset Notification"><i className="fas fa-sync-alt"></i></a>
                     </div>
                 </div>
                 <div className="footer-links">
