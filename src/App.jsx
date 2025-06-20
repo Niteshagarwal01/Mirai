@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import Home from './pages/Home.jsx'
 import Login from './pages/login.jsx'
@@ -14,10 +14,17 @@ import './css/registration-styles.css'
 import { initializeAnimations } from './components/script.js'
 
 function App() {
-  // Initialize animations when component mounts
+  const location = useLocation();
+  
+  // Initialize animations when component mounts and on route changes
   useEffect(() => {
-    initializeAnimations();
-  }, []);
+    // Small delay to ensure DOM is rendered
+    const timer = setTimeout(() => {
+      initializeAnimations();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [location.pathname]); // Re-run when route changes
 
   return (
     <div className="App">

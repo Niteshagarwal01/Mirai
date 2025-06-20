@@ -19,7 +19,7 @@ const setupCustomCursor = () => {
     const cursorOutline = getElement('cursor-outline');
     
     if (cursorDot && cursorOutline) {
-        document.addEventListener('mousemove', (e) => {
+        cursorHandler = (e) => {
             // Get mouse position
             const posX = e.clientX;
             const posY = e.clientY;
@@ -36,7 +36,9 @@ const setupCustomCursor = () => {
                 duration: 500,
                 fill: 'forwards'
             });
-        });
+        };
+        
+        document.addEventListener('mousemove', cursorHandler);
     }
 };
 
@@ -134,7 +136,7 @@ const animateNumbers = () => {
 
 // Parallax effect on floating elements
 const setupParallax = () => {
-    window.addEventListener('mousemove', (e) => {
+    parallaxHandler = (e) => {
         // Calculate mouse position as a percentage of window size
         const mouseX = e.clientX / window.innerWidth;
         const mouseY = e.clientY / window.innerHeight;
@@ -147,15 +149,16 @@ const setupParallax = () => {
         if (fluid1) fluid1.style.transform = `translate(${mouseX * 30}px, ${mouseY * 30}px)`;
         if (fluid2) fluid2.style.transform = `translate(${mouseX * -20}px, ${mouseY * 20}px)`;
         if (fluid3) fluid3.style.transform = `translate(${mouseX * 15}px, ${mouseY * -15}px)`;
-    });
+    };
+    
+    window.addEventListener('mousemove', parallaxHandler);
 };
 
 // Scroll-triggered animations
 const setupScrollAnimations = () => {
     const floatingNav = document.querySelector('.floating-nav');
     
-    // Detect when scrolled to bottom
-    window.addEventListener('scroll', () => {
+    scrollHandler = () => {
         // Shrink nav on scroll
         if (floatingNav) {
             if (window.scrollY > 100) {
@@ -167,7 +170,10 @@ const setupScrollAnimations = () => {
         
         // Update active link in nav
         highlightActiveSection();
-    });
+    };
+    
+    // Detect when scrolled to bottom
+    window.addEventListener('scroll', scrollHandler);
 };
 
 // Handle form submission
@@ -477,6 +483,9 @@ const setupSmoothScrolling = () => {
 
 // Main initialization function to export
 export const initializeAnimations = () => {
+    // Clean up any existing listeners first
+    cleanupAnimations();
+    
     // Wait for DOM to be fully loaded
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', setupAllFeatures);
@@ -484,6 +493,23 @@ export const initializeAnimations = () => {
         setupAllFeatures();
     }
 };
+
+// Cleanup function to remove existing event listeners
+function cleanupAnimations() {
+    // Remove existing mousemove listeners
+    const existingMouseMoveListeners = document.querySelectorAll('[data-mirai-listener]');
+    existingMouseMoveListeners.forEach(element => {
+        element.removeAttribute('data-mirai-listener');
+    });
+    
+    // Remove scroll listeners
+    window.removeEventListener('scroll', scrollHandler);
+    window.removeEventListener('mousemove', parallaxHandler);
+    window.removeEventListener('mousemove', cursorHandler);
+}
+
+// Store handlers for cleanup
+let scrollHandler, parallaxHandler, cursorHandler;
 
 // Setup all features and animations
 function setupAllFeatures() {
