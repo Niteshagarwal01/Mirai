@@ -1,7 +1,51 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { userService } from '../services/userService'
 
 const Signup = () => {
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: ''
+    });
+    const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        
+        try {
+            const response = await userService.register(formData);
+            
+            if (response.error) {
+                setError(response.error);
+            } else {
+                // Registration successful, redirect to login
+                navigate('/login');
+            }
+        } catch (err) {
+            setError('Registration failed. Please try again.');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    };
+
     return (
     <div className="registration-container">
         <div className="registration-left">           
@@ -53,12 +97,20 @@ const Signup = () => {
                 <h2>System&nbsp;<span className="registration-text">Registration</span></h2>
                 <p className="registration-subtitle">Join thousands of startups using Mirai</p>
                 
-                <form className="registration-form">
+                <form className="registration-form" onSubmit={handleSubmit}>
+                    {error && <div className="error-message">{error}</div>}
                     <div className="form-field">
                         <label>Name</label>
                         <div className="input-wrapper">
                             <i className="fas fa-user"></i>
-                            <input type="text" placeholder="John Doe" />
+                            <input 
+                                type="text" 
+                                name="name"
+                                placeholder="John Doe" 
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                            />
                         </div>
                     </div>
                     
@@ -66,7 +118,14 @@ const Signup = () => {
                         <label>Email</label>
                         <div className="input-wrapper">
                             <i className="fas fa-envelope"></i>
-                            <input type="email" placeholder="name@example.com" />
+                            <input 
+                                type="email" 
+                                name="email"
+                                placeholder="name@example.com" 
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
                         </div>
                     </div>
                     
@@ -74,12 +133,25 @@ const Signup = () => {
                         <label>Password</label>
                         <div className="input-wrapper">
                             <i className="fas fa-lock"></i>
-                            <input type="password" />
-                            <i className="fas fa-eye password-toggle"></i>
+                            <input 
+                                type={showPassword ? "text" : "password"} 
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                            />
+                            <i 
+                                className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"} password-toggle`}
+                                onClick={togglePasswordVisibility}
+                            ></i>
                         </div>
                     </div>                   
-                    <button className="create-account-btn">
-                        Create Account <span className="arrow-icon">→</span>
+                    <button 
+                        className="create-account-btn" 
+                        type="submit"
+                        disabled={loading}
+                    >
+                        {loading ? "Creating Account..." : "Create Account"} {!loading && <span className="arrow-icon">→</span>}
                     </button>
                     
                     <div className="login-divider">

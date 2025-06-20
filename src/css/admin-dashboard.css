@@ -1,0 +1,193 @@
+/* Admin Dashboard Styles */
+.admin-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(45deg, #0a0a14 0%, #14141f 100%);
+  color: var(--text-main);
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba(20, 20, 35, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(52, 255, 233, 0.1);
+}
+
+.admin-user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  color: #c4c4ce;
+}
+
+.logout-btn {
+  background: rgba(110, 64, 255, 0.2);
+  color: #fff;
+  border: 1px solid rgba(110, 64, 255, 0.4);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(110, 64, 255, 0.3);
+}
+
+.admin-content {
+  display: flex;
+  height: calc(100vh - 65px);
+}
+
+.admin-sidebar {
+  width: 240px;
+  background: rgba(20, 20, 35, 0.5);
+  border-right: 1px solid rgba(52, 255, 233, 0.1);
+  padding: 24px 0;
+}
+
+.admin-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.admin-menu li {
+  padding: 14px 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  color: #c4c4ce;
+}
+
+.admin-menu li:hover {
+  background: rgba(52, 255, 233, 0.05);
+  color: #fff;
+}
+
+.admin-menu li.active {
+  background: rgba(110, 64, 255, 0.15);
+  border-left: 3px solid #6e40ff;
+  color: #fff;
+}
+
+.admin-menu li i {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 24px 32px;
+  overflow-y: auto;
+}
+
+.admin-main h1 {
+  margin-bottom: 24px;
+  font-size: 24px;
+  color: #fff;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, rgba(20, 20, 35, 0.7), rgba(30, 30, 50, 0.7));
+  border: 1px solid rgba(52, 255, 233, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+  border-color: rgba(110, 64, 255, 0.3);
+}
+
+.stat-card h3 {
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: #c4c4ce;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.stat-icon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 22px;
+  opacity: 0.6;
+  color: #6e40ff;
+}
+
+.admin-panel {
+  background: linear-gradient(135deg, rgba(20, 20, 35, 0.7), rgba(30, 30, 50, 0.7));
+  border: 1px solid rgba(52, 255, 233, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.admin-panel h2 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.activity-list {
+  color: #c4c4ce;
+  font-size: 14px;
+}
+
+.admin-error {
+  background-color: rgba(255, 87, 87, 0.15);
+  border: 1px solid rgba(255, 87, 87, 0.3);
+  color: #ff5757;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.admin-loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(45deg, #0a0a14 0%, #14141f 100%);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid rgba(52, 255, 233, 0.1);
+  border-top-color: #6e40ff;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,7 +1,74 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { userService } from '../services/userService'
 
 const Login = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    
+    try {
+      // Special case for admin login (using the admin we created in MongoDB)
+      if (formData.email === 'admin' || formData.email === 'Nitesh') {
+        // Admin login using name
+        const response = await userService.login({
+          name: 'Nitesh'
+        });
+        
+        if (response.error) {
+          setError(response.error);
+        } else {
+          // Save user info to localStorage
+          localStorage.setItem('user', JSON.stringify(response.user));
+          navigate('/admin');
+        }
+      } else {
+        // Regular login flow
+        const response = await userService.login(formData);
+        
+        if (response.error) {
+          setError(response.error);
+        } else {
+          // Save user info to localStorage
+          localStorage.setItem('user', JSON.stringify(response.user));
+          
+          // Redirect based on role
+          if (response.user.role === 'admin') {
+            navigate('/admin');
+          } else {
+            navigate('/');
+          }
+        }
+      }
+    } catch (err) {
+      setError('Login failed. Please check your credentials and try again.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div>
       <div className="login-container">
@@ -47,12 +114,21 @@ const Login = () => {
             <div className="login-form-container">
                 <h2>System <span className="access-text">Access</span></h2>
                 <p className="login-subtitle">Sign in to your account to continue</p>
-                  <form className="login-form">
+                  <form className="login-form" onSubmit={handleSubmit}>
+                    {error && <div className="error-message">{error}</div>}
+                    
                     <div className="form-field">
                         <label>Email</label>
                         <div className="input-wrapper">
                             <i className="fas fa-envelope"></i>
-                            <input type="email" placeholder="name@example.com" />
+                            <input 
+                              type="email" 
+                              name="email"
+                              placeholder="name@example.com" 
+                              value={formData.email}
+                              onChange={handleChange}
+                              required
+                            />
                         </div>
                     </div>
                     
@@ -60,14 +136,28 @@ const Login = () => {
                         <label>Password</label>
                         <div className="input-wrapper">
                             <i className="fas fa-lock"></i>
-                            <input type="password" />
-                            <i className="fas fa-eye password-toggle"></i>
+                            <input 
+                              type={showPassword ? "text" : "password"} 
+                              name="password"
+                              value={formData.password}
+                              onChange={handleChange}
+                              required
+                            />
+                            <i 
+                              className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"} password-toggle`}
+                              onClick={togglePasswordVisibility}
+                            ></i>
                         </div>
                         <div className="forgot-password">
                             <a href="#">Forgot password?</a>
                         </div>
-                    </div>                    <button className="sign-in-btn">
-                        Sign In <span className="arrow-icon">→</span>
+                    </div>                    
+                    <button 
+                      className="sign-in-btn" 
+                      type="submit"
+                      disabled={loading}
+                    >
+                        {loading ? "Signing in..." : "Sign In"} {!loading && <span className="arrow-icon">→</span>}
                     </button>
                     
                     <div className="login-divider">

@@ -1,11 +1,11 @@
 /* Custom fixes for login page text boxes */
 .feature-text-box {
-    padding: 7px 10px;
-    margin-top: 6px;
-    font-size: 10px;
-    line-height: 1.2;
+    padding: 4px 6px;
+    margin-top: 3px;
+    font-size: 9px;
+    line-height: 1.15;
     max-width: 100%;
-    margin-bottom: 6px;
+    margin-bottom: 3px;
     max-height: none;
     overflow: visible;
     text-overflow: initial;
@@ -14,16 +14,16 @@
     line-clamp: initial;
     -webkit-box-orient: initial;
     box-orient: initial;
-    border-radius: 8px; /* Ensure text boxes don't have unnecessary constraints */
+    border-radius: 6px; /* Ensure text boxes don't have unnecessary constraints */
 }
 
 .register-feature {
-    padding: 12px;
-    margin-bottom: 16px;
+    padding: 8px;
+    margin-bottom: 8px;
     max-height: none;
     height: auto;
     overflow: visible;
-    border-radius: 12px;
+    border-radius: 8px;
     transition: transform 0.2s ease;
 }
 
@@ -35,9 +35,9 @@
 }
 
 .feature-desc {
-    font-size: 13px;
-    line-height: 1.3;
-    margin-bottom: 4px;
+    font-size: 11px;
+    line-height: 1.15;
+    margin-bottom: 2px;
     max-width: 95%;
 }
 
@@ -66,15 +66,15 @@
 
 /* Make the feature highlight box properly sized */
 .feature-highlight-box {
-    margin-bottom: 15px;
-    padding: 8px 12px;
-    font-size: 13px;
+    margin-bottom: 8px;
+    padding: 5px 8px;
+    font-size: 10px;
 }
 
 /* Additional fixes to prevent text cutoff */
 .registration-left {
-    padding: 24px;
-    width: 50%; /* Increase the width from 45% to 50% */
+    padding: 16px;
+    width: 40%;
 }
 
 /* Adjust right side to balance the layout */
@@ -117,7 +117,7 @@
 .feature-list {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
     margin-top: 10px;
     overflow: hidden;
 }

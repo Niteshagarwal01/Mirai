@@ -1,8 +1,9 @@
-import { Routes, Route, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import Home from './pages/Home.jsx'
 import Login from './pages/login.jsx'
 import Signup from './pages/Signup.jsx'
+import AdminDashboard from './pages/AdminDashboard.jsx'
 import './css/App.css'
 import './css/custom-login-fix.css'
 import './css/feature-detail.css'
@@ -11,10 +12,25 @@ import './css/login-styles.css'
 import './css/onboarding.css'
 import './css/pricing-page.css'
 import './css/registration-styles.css'
+import './css/admin-dashboard.css'
 import { initializeAnimations } from './components/script.js'
+
+// Protected route component
+const ProtectedRoute = ({ element, allowedRoles = [] }) => {
+  const userJson = localStorage.getItem('user');
+  const user = userJson ? JSON.parse(userJson) : null;
+  
+  // Check if user is authenticated and has an allowed role
+  if (!user || (allowedRoles.length > 0 && !allowedRoles.includes(user.role))) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return element;
+};
 
 function App() {
   const location = useLocation();
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
   
   // Initialize animations when component mounts and on route changes
   useEffect(() => {
@@ -25,23 +41,36 @@ function App() {
     
     return () => clearTimeout(timer);
   }, [location.pathname]); // Re-run when route changes
+  
+  // Listen for changes to user in localStorage
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setUser(JSON.parse(localStorage.getItem('user')) || null);
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   return (
     <div className="App">
       <div className="cursor-dot" id="cursor-dot"></div>
       <div className="cursor-outline" id="cursor-outline"></div>
           {/* //Fixed Fluid Elements */}
-    <div className="fluid-element" id="fluid1"></div>
-    <div className="fluid-element" id="fluid2"></div>
-    <div className="fluid-element" id="fluid3"></div>   
+      <div className="fluid-element" id="fluid1"></div>
+      <div className="fluid-element" id="fluid2"></div>
+      <div className="fluid-element" id="fluid3"></div>   
     
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route 
+              path="/admin" 
+              element={<ProtectedRoute element={<AdminDashboard />} allowedRoles={['admin']} />} 
+            />
           </Routes>
-
         </main>
     </div>
   )
