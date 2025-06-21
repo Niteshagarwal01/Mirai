@@ -44,13 +44,12 @@ const Login = () => {
     // If admin credentials, bypass MongoDB completely
     if (isAdminEmail && isAdminPassword) {
       console.log('Admin bypass login - skipping MongoDB');
-      
-      // Create local admin user object
+        // Create local admin user object using the proper id field instead of _id
       const adminUser = {
         name: 'Nitesh',
         email: isAdminEmail ? formData.email : 'admin@mirai.com',
         role: 'admin',
-        _id: 'admin-local-bypass-' + Date.now() // Add timestamp for uniqueness
+        id: 'admin-local-bypass-1' // Use the proper ID from localUsers.json
       };
       
       // Save admin user info to localStorage
@@ -100,13 +99,12 @@ const Login = () => {
         // Double-check for admin credentials as fallback
         if (isAdminEmail && isAdminPassword) {
           console.log('MongoDB failed, using admin bypass as fallback');
-          
-          // Create local admin user object as fallback
+            // Create local admin user object as fallback - use the proper id
           const adminUser = {
             name: 'Nitesh',
             email: isAdminEmail ? formData.email : 'admin@mirai.com',
             role: 'admin',
-            _id: 'admin-local-bypass-' + Date.now() // Add timestamp for uniqueness
+            id: 'admin-local-bypass-1' // Use the proper ID from localUsers.json
           };
           
           // Save admin user info to localStorage
@@ -234,15 +232,7 @@ const Login = () => {
                     >
                         {loading ? "Signing in..." : "Sign In"} {!loading && <span className="arrow-icon">→</span>}
                     </button>
-                    
-                    <div className="login-divider">
-                        <span>or continue with</span>
-                    </div>
-                    
-                    <button className="google-btn">
-                        <img src="../assets/google-logo.svg" alt="Google" />
-                        Sign in with Google
-                    </button>
+                      {/* Google sign-in removed as requested */}
                     <div className="account-option">
                         Don't have an account? <Link to="/Signup" className="create-account-link">Create an account</Link>
                     </div>

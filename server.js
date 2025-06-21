@@ -1,8 +1,8 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
-import connectDB from './src/db/conn.js';
-import User from './src/models/User.js';
+// Using file-based DB instead of MongoDB
+import { userOperations, dashboardOperations, contentOperations, campaignOperations } from './src/db/fileDb.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fetch from 'node-fetch'; // Add this for making API calls to Gemini/Groq
@@ -18,8 +18,7 @@ const PORT = process.env.PORT || 5000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyAjgMZWNZtdpiQDxm1zz5jddalLOBp_vpY';
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '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';
 
-// Connect to MongoDB
-connectDB();
+console.log('✅ File-based DB initialized successfully');
 
 // Middleware
 app.use(express.json());
@@ -33,31 +32,30 @@ const __dirname = path.dirname(__filename);
 app.post('/api/users/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
-    // Check if user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: 'User with this email already exists' });
+    
+    try {
+      // Create new user using file DB
+      const newUser = await userOperations.createUser({
+        name,
+        email,
+        password,
+        role: 'user'
+      });
+        // Get updated user count for localStorage backup
+      const userCount = userOperations.countUsersByRole('user');
+      
+      res.status(201).json({
+        success: true,
+        message: 'User registered successfully',
+        user: newUser,
+        userCount: userCount // Send user count to client for localStorage backup
+      });
+    } catch (error) {
+      if (error.message === 'User with this email already exists') {
+        return res.status(400).json({ error: 'User with this email already exists' });
+      }
+      throw error; // Re-throw for the outer catch
     }
-
-    // Hash the password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create new user
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword
-    });
-
-    // Save user to database
-    await newUser.save();
-
-    res.status(201).json({
-      success: true,
-      message: 'User registered successfully'
-    });
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({
@@ -71,56 +69,55 @@ app.post('/api/users/login', async (req, res) => {
   try {
     const { email, password, name } = req.body;
 
-    // Find user by email or name (for our admin user)
-    let user;
+    // Check admin bypass login
+    const isAdminEmail = email === 'admin@mirai.com' || 
+                        email === 'admin' || 
+                        email === 'Nitesh' ||
+                        name === 'Nitesh';
     
-    if (email) {
-      user = await User.findOne({ email });
-    } else if (name) {
-      user = await User.findOne({ name });
-    }
+    const isAdminPassword = password === 'Admin@123' || 
+                          password === 'admin123' || 
+                          password === 'password';
     
-    if (!user) {
-      return res.status(400).json({ error: 'Invalid credentials' });
-    }
-
-    // For our admin prototype user (who doesn't have a password)
-    if (user.role === 'admin' && user.name === 'Nitesh' && !user.password) {
-      // Simplified admin login for prototype (no password check)
-      // In production, always use password verification
-      const userResponse = {
-        id: user._id,
-        name: user.name,
-        role: user.role,
-        email: user.email || '' // Handle null email
-      };
-
+    // Special admin bypass login
+    if (isAdminEmail && isAdminPassword) {
+      console.log('Admin bypass login');
+      
+      // Check if admin exists, otherwise use default admin
+      let adminUser = userOperations.findUser('Nitesh') || 
+                     userOperations.findUser('admin@mirai.com');
+        // If admin doesn't exist in file db, use the admin from localUsers.json
+      if (!adminUser) {
+        adminUser = {
+          id: 'admin-local-bypass-1', // Use the same ID as in localUsers.json
+          name: 'Nitesh',
+          email: 'admin@mirai.com',
+          role: 'admin'
+        };
+      }
+      
+      // Log the admin details for debugging
+      console.log('Admin login successful:', adminUser);
+      
       return res.status(200).json({
         success: true,
-        user: userResponse,
+        user: adminUser,
         message: 'Admin login successful'
       });
     }
 
-    // Verify password for regular users
-    if (!user.password) {
+    // Regular user login
+    let identifier = email || name;
+    let user = await userOperations.verifyUser(identifier, password);
+    
+    if (!user) {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
     
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ error: 'Invalid credentials' });
-    }// Return user info (excluding password)
-    const userResponse = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role
-    };
-
+    // Return success with user info
     res.status(200).json({
       success: true,
-      user: userResponse,
+      user: user,
       message: 'Login successful'
     });
   } catch (error) {
@@ -134,19 +131,24 @@ app.post('/api/users/login', async (req, res) => {
 // Admin authentication middleware
 const isAdmin = async (req, res, next) => {
   try {
-    // Get user from database (assuming you'll implement authentication with JWT later)
-    // For now we'll use email or name
-    const { email, name } = req.body;
+    // Get user from request body (for API calls) or query params (for direct requests)
+    const { email, name, userId } = req.body || req.query || {};
     
+    // Handle admin bypass case for the admin dashboard
+    if (userId && (userId.includes('admin-local-bypass') || userId === 'admin-local-bypass-1')) {
+      return next();
+    }
+    
+    // Find user in file DB
     let user;
     
     if (email) {
-      user = await User.findOne({ email });
+      user = userOperations.findUser(email);
     } else if (name) {
-      user = await User.findOne({ name });
+      user = userOperations.findUser(name);
     } else {
       // For our prototype admin, use 'Nitesh' as default
-      user = await User.findOne({ name: 'Nitesh' });
+      user = userOperations.findUser('Nitesh');
     }
     
     if (!user || user.role !== 'admin') {
@@ -163,16 +165,16 @@ const isAdmin = async (req, res, next) => {
 // Admin Dashboard Data Route (protected)
 app.post('/api/admin/dashboard', isAdmin, async (req, res) => {
   try {
-    // Get user count
-    const userCount = await User.countDocuments({ role: 'user' });
-    
+    // Get dashboard stats from fileDb system
+    const stats = dashboardOperations.getDashboardStats();
+      // Get the actual values from the file-based DB
     res.status(200).json({
       success: true,
       stats: {
-        userCount,
-        // Add more stats as needed
-        activeUsers: Math.floor(userCount * 0.8), // Dummy data for prototype
-        newSignups: Math.floor(userCount * 0.2), // Dummy data for prototype
+        userCount: stats.userCount,  // Real value from fileDb
+        activeUsers: stats.activeUsers,  // Real value from fileDb
+        campaigns: stats.campaigns,  // Real value from fileDb
+        newSignups: stats.newSignups  // Real value from fileDb
       }
     });
   } catch (error) {
@@ -200,16 +202,21 @@ app.post('/api/ai/generate', async (req, res) => {
       Ensure the content is engaging, well-structured, and optimized for ${contentType} format.
       Include appropriate hashtags and formatting where relevant.
     `;
-    
-    // Try Gemini API first
+      // Try Gemini API first
     try {
       const geminiResponse = await callGeminiAPI(formattedPrompt, contentType);
       
       // Save to history if userId is provided
       if (userId) {
-        // Save generation history to database (simplified for now)
+        // Save generation history to file DB
         console.log(`Saving content history for user ${userId}`);
-        // Implement history saving logic here
+        contentOperations.addContentHistory({
+          userId,
+          contentType,
+          prompt,
+          content: geminiResponse,
+          provider: 'gemini'
+        });
       }
       
       return res.status(200).json({
@@ -226,8 +233,15 @@ app.post('/api/ai/generate', async (req, res) => {
         
         // Save to history if userId is provided
         if (userId) {
-          // Save generation history logic
+          // Save generation history to file DB
           console.log(`Saving content history for user ${userId}`);
+          contentOperations.addContentHistory({
+            userId,
+            contentType,
+            prompt,
+            content: groqResponse,
+            provider: 'groq'
+          });
         }
         
         return res.status(200).json({
@@ -250,37 +264,35 @@ app.post('/api/ai/generate', async (req, res) => {
 
 // Get content types
 app.get('/api/ai/content-types', (req, res) => {
-  // Return predefined content types
+  // Return predefined content types with image paths
   const contentTypes = [
     {
       id: 'instagram-post',
       name: 'Instagram Post',
       icon: 'instagram',
+      image: '/src/assets/insta.jpeg',
       description: 'Create engaging captions and visuals optimized for Instagram\'s audience'
     },
     {
       id: 'linkedin-post',
       name: 'LinkedIn Post',
       icon: 'linkedin',
+      image: '/src/assets/LinkedIn-Logo-2-scaled.jpg',
       description: 'Professional content that drives engagement and showcases expertise'
     },
     {
       id: 'twitter-post',
       name: 'Twitter Post',
       icon: 'twitter',
+      image: '/src/assets/twitter.jpeg',
       description: 'Concise, engaging tweets that spark conversation and sharing'
     },
     {
       id: 'blog-post',
       name: 'Blog Post',
       icon: 'file-alt',
+      image: '/src/assets/blogpost.jpeg',
       description: 'In-depth content that educates your audience and builds authority'
-    },
-    {
-      id: 'email',
-      name: 'Email Copy',
-      icon: 'envelope',
-      description: 'Compelling email content designed to boost open and click-through rates'
     }
   ];
   
@@ -299,8 +311,7 @@ app.get('/api/ai/history', async (req, res) => {
       return res.status(400).json({ error: 'User ID is required' });
     }
     
-    // For prototype, return mock data
-    // In production, fetch from database
+    // For file-based system, use the mock data for all users
     const mockHistory = [
       {
         id: '1',
@@ -317,6 +328,22 @@ app.get('/api/ai/history', async (req, res) => {
         prompt: 'Digital marketing trends 2025',
         content: '# Top Digital Marketing Trends for 2025\n\nAs we move further into the digital age, marketing strategies continue to evolve at a rapid pace...',
         createdAt: new Date(Date.now() - 172800000).toISOString() // 2 days ago
+      },
+      {
+        id: '3',
+        userId,
+        contentType: 'twitter-post',
+        prompt: 'AI assistant product launch',
+        content: 'Excited to announce our new AI assistant! It\'s going to revolutionize how you work. Early access sign-ups open now! #AIAssistant #ProductLaunch #Innovation',
+        createdAt: new Date(Date.now() - 259200000).toISOString() // 3 days ago
+      },
+      {
+        id: '4',
+        userId,
+        contentType: 'linkedin-post',
+        prompt: 'Industry leadership insights',
+        content: 'I\'m excited to share some key insights from our latest industry research.\n\nOur team found that companies embracing AI are seeing a 40% increase in productivity.\n\nWhat has been your experience with AI adoption? Share in the comments below!\n\n#AIInnovation #Leadership #IndustryInsights',
+        createdAt: new Date(Date.now() - 345600000).toISOString() // 4 days ago
       }
     ];
     
@@ -330,6 +357,38 @@ app.get('/api/ai/history', async (req, res) => {
     res.status(500).json({
       error: 'Failed to fetch content history'
     });
+  }
+});
+
+// Get Users List Route (protected)
+app.get('/api/admin/users', isAdmin, (req, res) => {
+  try {
+    // Get all users from file DB
+    const users = userOperations.getAllUsers();
+    
+    res.status(200).json({
+      success: true,
+      users
+    });
+  } catch (error) {
+    console.error('Get users error:', error);
+    res.status(500).json({ error: 'Server error getting users data' });
+  }
+});
+
+// Get User Count Route
+app.get('/api/stats/user-count', (req, res) => {
+  try {
+    // Get user count from file DB
+    const userCount = userOperations.countUsersByRole('user');
+    
+    res.status(200).json({
+      success: true,
+      userCount
+    });
+  } catch (error) {
+    console.error('Get user count error:', error);
+    res.status(500).json({ error: 'Server error getting user count' });
   }
 });
 
@@ -410,6 +469,9 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.resolve(__dirname, '../dist', 'index.html'));
   });
 }
+
+// Initialize default campaigns if there are none
+campaignOperations.initializeCampaigns();
 
 // Start the server
 app.listen(PORT, () => {
