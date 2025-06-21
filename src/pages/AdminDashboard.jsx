@@ -92,10 +92,9 @@ const AdminDashboard = () => {
     
     fetchDashboardData();
   }, [navigate, userData]);
-  
-  const handleLogout = () => {
+    const handleLogout = () => {
     localStorage.removeItem('user');
-    navigate('/login');
+    navigate('/'); // Redirect to home page instead of login page
   };
   
   if (loading) {
@@ -175,14 +174,8 @@ const AdminDashboard = () => {
                 <span>Settings</span>
               </Link>
             </li>
-          </ul>
-        </div>
-        
-        <div className="upgrade-section">
-          <div className="upgrade-container">
-            <p>Upgrade to Pro</p>
-            <small>Unlock advanced features</small>
-          </div>
+          </ul>        </div>
+        <div className="sidebar-footer">
         </div>
       </div>
       
@@ -248,18 +241,7 @@ const AdminDashboard = () => {
                 </div>
                 
                 <div className="admin-panel">
-                  <h2>Welcome to Admin Dashboard</h2>
-                  <div className="activity-list">
-                    {userData._id && userData._id.includes('admin-local-bypass') ? (
-                      <p>
-                        <strong>MongoDB Connection Bypassed:</strong> You are currently using the admin dashboard in offline mode. 
-                        This special mode was created to allow judges and evaluators to access the admin features even when MongoDB 
-                        IP whitelist restrictions prevent database access from different networks.
-                      </p>
-                    ) : (
-                      <p>This is a prototype admin dashboard. Full functionality will be implemented in the final version.</p>
-                    )}
-                  </div>
+                 
                   
                   <div className="content-navigation-note">
                     <div className="note-icon"><i className="fas fa-lightbulb"></i></div>

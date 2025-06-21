@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Navbar from '../components/navbar'
 import Footer from '../components/footer'
 import BlackModernWorldNoTobaccoDayInstagramPost from '../assets/Black Modern World No Tobacco Day Instagram Post  (1).png'
@@ -10,6 +10,10 @@ import reactSvg from '../assets/react.svg'
 const Home = () => {
     // State to control notification visibility
     const [showNotification, setShowNotification] = useState(true);
+    // State for admin login modal
+    const [showAdminModal, setShowAdminModal] = useState(false);
+    
+    const navigate = useNavigate();
     
     // Load visibility state from localStorage when component mounts
     useEffect(() => {
@@ -21,6 +25,23 @@ const Home = () => {
     const hideNotification = () => {
         setShowNotification(false);
         localStorage.setItem('hidePrototypeNotification', 'true');
+    };
+      // Function to handle feature box clicks
+    const handleFeatureClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setShowAdminModal(true);
+    };
+    
+    // Function to close the admin modal
+    const closeAdminModal = () => {
+        setShowAdminModal(false);
+    };
+    
+    // Function to redirect to login page
+    const goToAdminLogin = () => {
+        setShowAdminModal(false);
+        navigate('/login');
     };
     
     return (
@@ -39,6 +60,22 @@ const Home = () => {
                 <button className="close-note" onClick={hideNotification}>
                     <i className="fas fa-times"></i>
                 </button>
+            </div>
+        </div>
+    )}
+      {/* Admin Login Modal */}
+    {showAdminModal && (
+        <div className="admin-modal-overlay">
+            <div className="admin-modal">
+                <div className="admin-modal-content">
+                    <h3>Admin Access Required</h3>
+                    <p>This feature is available only for hackathon judges. Please log in with admin credentials:</p>
+                    <p><strong>Email:</strong> admin@mirai.com <strong>Password:</strong> Admin@123</p>
+                    <div className="admin-modal-buttons">
+                        <button className="btn-secondary" onClick={closeAdminModal}>Cancel</button>
+                        <button className="btn-primary" onClick={goToAdminLogin}>Login as Admin</button>
+                    </div>
+                </div>
             </div>
         </div>
     )}
@@ -109,7 +146,7 @@ const Home = () => {
                 <p>Transform your digital marketing experience with our powerful suite of features</p>
             </div>
             <div className="feature-grid">
-                <a href="pages/features/ai-product-photoshoot.html" className="feature-item">
+                <a href="pages/features/ai-product-photoshoot.html" className="feature-item" onClick={handleFeatureClick}>
                     <div className="feature-icon">
                         <i className="fas fa-camera-retro"></i>
                     </div>
@@ -121,7 +158,7 @@ const Home = () => {
                         <i className="fas fa-arrow-right"></i>
                     </div>
                 </a>
-                <a href="pages/features/marketing-chat-assistant.html" className="feature-item">
+                <a href="pages/features/marketing-chat-assistant.html" className="feature-item" onClick={handleFeatureClick}>
                     <div className="feature-icon">
                         <i className="fas fa-comment-dots"></i>
                     </div>
@@ -133,7 +170,7 @@ const Home = () => {
                         <i className="fas fa-arrow-right"></i>
                     </div>
                 </a>
-                <a href="pages/features/voice-sales-agent.html" className="feature-item">
+                <a href="pages/features/voice-sales-agent.html" className="feature-item" onClick={handleFeatureClick}>
                     <div className="feature-icon">
                         <i className="fas fa-phone-alt"></i>
                     </div>
@@ -145,7 +182,7 @@ const Home = () => {
                         <i className="fas fa-arrow-right"></i>
                     </div>
                 </a>
-                <a href="pages/features/content-generation.html" className="feature-item">
+                <a href="pages/features/content-generation.html" className="feature-item" onClick={handleFeatureClick}>
                     <div className="feature-icon">
                         <i className="fas fa-file-alt"></i>
                     </div>
@@ -157,7 +194,7 @@ const Home = () => {
                         <i className="fas fa-arrow-right"></i>
                     </div>
                 </a>
-                <a href="pages/features/email-marketing-engine.html" className="feature-item">
+                <a href="pages/features/email-marketing-engine.html" className="feature-item" onClick={handleFeatureClick}>
                     <div className="feature-icon">
                         <i className="fas fa-envelope"></i>
                     </div>
@@ -169,7 +206,7 @@ const Home = () => {
                         <i className="fas fa-arrow-right"></i>
                     </div>
                 </a>
-                <a href="pages/features/competitor-analysis.html" className="feature-item">
+                <a href="pages/features/competitor-analysis.html" className="feature-item" onClick={handleFeatureClick}>
                     <div className="feature-icon">
                         <i className="fas fa-chart-bar"></i>
                     </div>
@@ -204,7 +241,7 @@ const Home = () => {
                             <li><i className="fas fa-check"></i> Content generation (10 pieces/month)</li>
                             <li><i className="fas fa-check"></i> Essential analytics dashboard</li>
                         </ul>
-                    </div>                    <Link to="/login" className="btn-primary">Get Started</Link>
+                    </div>                    <Link to="/upgrade-pro" className="btn-primary">Upgrade Now</Link>
                 </div>
                 <div className="pricing-card featured">
                     <div className="popular-tag">Most Popular</div>
@@ -221,7 +258,7 @@ const Home = () => {
                             <li><i className="fas fa-check"></i> Enhanced analytics with reporting</li>
                             <li><i className="fas fa-check"></i> 3D model generation (10/month)</li>
                         </ul>                    </div>
-                    <Link to="/login" className="btn-primary">Get Started</Link>
+                    <Link to="/upgrade-pro" className="btn-primary">Upgrade Now</Link>
                 </div>
                 <div className="pricing-card">
                     <div className="pricing-header">
@@ -238,9 +275,8 @@ const Home = () => {
                             <li><i className="fas fa-check"></i> Unlimited 3D model generation</li>
                             <li><i className="fas fa-check"></i> Priority technical support</li>
                             <li><i className="fas fa-check"></i> API access for custom integrations</li>
-                        </ul>
-                    </div>
-                    <Link to="/login" className="btn-primary">Get Started</Link>
+                        </ul>                    </div>
+                    <Link to="/upgrade-pro" className="btn-primary">Upgrade Now</Link>
                 </div>
             </div>
         </div>
@@ -317,8 +353,9 @@ const Home = () => {
         <div className="container">
             <div className="cta-content">
                 <h2>Ready to Transform Your Marketing?</h2>
-                <p>Start your 14-day free trial today. No credit card required.</p>                <div className="cta-buttons">                    <Link to="/login" className="btn-primary">Get Started Free</Link>
-                    <a href="#demo" className="btn-secondary">Book a Demo</a>
+                <p>Start your 14-day free trial today. No credit card required.</p>                <div className="cta-buttons">
+                    <Link to="/signup" className="btn-primary">Get Started Free</Link>
+                    <Link to="/upgrade-pro" className="btn-secondary">Upgrade to Pro</Link>
                 </div>
             </div>
         </div>

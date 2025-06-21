@@ -2,9 +2,10 @@ import { Routes, Route, useLocation, Navigate, Outlet } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import Home from './pages/Home.jsx'
 import Login from './pages/login.jsx'
-import Signup from './pages/Signup.jsx'
+import Signup from './pages/signup.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
 import ContentGenerator from './pages/ContentGenerator.jsx'
+import UpgradeToPro from './pages/UpgradeToPro.jsx'
 import './css/App.css'
 import './css/custom-login-fix.css'
 import './css/feature-detail.css'
@@ -15,6 +16,7 @@ import './css/pricing-page.css'
 import './css/registration-styles.css'
 import './css/admin-dashboard.css'
 import './css/content-generator.css'
+import './css/upgrade-pro.css'
 import { initializeAnimations } from './components/script.js'
 
 // Protected route component
@@ -63,11 +65,11 @@ function App() {
       <div className="fluid-element" id="fluid2"></div>
       <div className="fluid-element" id="fluid3"></div>   
     
-        <main>
-          <Routes>
+        <main>          <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/upgrade-pro" element={<UpgradeToPro />} />
             <Route 
               path="/admin" 
               element={<ProtectedRoute element={<AdminDashboard />} allowedRoles={['admin']} />}
