@@ -16,7 +16,8 @@ const Navbar = () => {
             <a href="#pricing">Pricing</a>
             <a href="#testimonials">Testimonials</a>
             <a href="#demo">Demo</a>
-        </div><div className="nav-cta">           
+        </div><div className="nav-cta">
+            <Link to="/upgrade-pro" className="btn-accent">Upgrade to Pro</Link>           
             <Link to="/login" className="btn-secondary">Log In</Link>
             <Link to="/signup" className="btn-primary">Sign Up Free</Link>
         </div>

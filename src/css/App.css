@@ -486,6 +486,24 @@ p {
     box-shadow: var(--shadow-md);
 }
 
+.btn-accent {
+    background: linear-gradient(to right, var(--accent), #2bccb8);
+    color: var(--bg-dark);
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: var(--transition-normal);
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+}
+
+.btn-accent:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(52, 255, 233, 0.4);
+}
+
 /* ===== Hero Section ===== */
 .hero {
     min-height: 100vh;
@@ -1389,7 +1407,7 @@ footer::before {
 }
 
 .footer-column ul li a:hover {
-    color: var(--accent);
+    color: var(--text-main);
     padding-left: 5px;
 }
 
@@ -2230,9 +2248,9 @@ footer::before {
 }
 
 .video-message i {
-    font-size: 48px;
-    background: linear-gradient(to right, #34ffe9, #6e40ff);
+    font-size: 48px;    background: linear-gradient(to right, #34ffe9, #6e40ff);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 20px;
 }
@@ -2479,17 +2497,71 @@ footer::before {
     margin-top: 4px;
 }
 
-@media (max-width: 768px) {
-    .demo-cta {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        margin-top: 30px;
-        gap: 20px;
+/* Admin Modal Styles */
+.admin-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(10, 10, 20, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.admin-modal {
+    background-color: var(--bg-card);
+    border-radius: 12px;
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: modal-pop 0.3s ease-out forwards;
+}
+
+.admin-modal-content {
+    text-align: center;
+}
+
+.admin-modal-content h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-main);
+}
+
+.admin-modal-content p {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.admin-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.admin-modal-buttons button {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+@keyframes modal-pop {
+    0% {
+        transform: scale(0.9);
+        opacity: 0;
     }
-    
-    .demo-stats {
-        width: 100%;
-        justify-content: space-between;
+    100% {
+        transform: scale(1);
+        opacity: 1;
     }
 }

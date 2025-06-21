@@ -33,7 +33,8 @@ const AdminDashboard = () => {
       }
     }
   }, []);
-    useEffect(() => {
+  
+  useEffect(() => {
     // Check if user is admin, else redirect
     if (!userData || userData.role !== 'admin') {
       navigate('/login');
@@ -45,14 +46,17 @@ const AdminDashboard = () => {
       userData._id = userData.id; // Add _id if only id exists
     } else if (userData._id && !userData.id) {
       userData.id = userData._id; // Add id if only _id exists
-    }// Even for admin bypass, fetch real data from our file system
+    }
+
+    // Even for admin bypass, fetch real data from our file system
     // but handle the case differently
     if (userData.id && userData.id.includes('admin-local-bypass') || 
         userData._id && userData._id.includes('admin-local-bypass')) {
       console.log('Fetching file-based dashboard data');
       // We'll still fetch data but with a specific flag for the bypass mode
     }
-      // Fetch dashboard data
+    
+    // Fetch dashboard data
     const fetchDashboardData = async () => {
       try {
         const response = await fetch('/api/admin/dashboard', {
@@ -72,17 +76,63 @@ const AdminDashboard = () => {
           setError(data.error);
         } else {
           setDashboardData(data.stats);
-        }      } catch (err) {
-        console.error('Dashboard data fetch error:', err);        // Use more logical fallback data - get user counts from localStorage if possible
+        }
+      } catch (err) {
+        console.error('Dashboard data fetch error:', err);
+        
+        // Use more logical fallback data - get user counts from localStorage if possible
         const localStorageUsers = localStorage.getItem('localUserCount');
-        const userCount = localStorageUsers ? parseInt(localStorageUsers) : 1;
+        const userCount = localStorageUsers ? parseInt(localStorageUsers) : 2;
         
         setDashboardData({
           userCount: userCount,
           activeUsers: Math.min(userCount, Math.ceil(userCount * 0.8)), // Never more than total
           campaigns: 4,
           engagementRate: '4.7%',
-          revenue: '$12,450'
+          revenue: '$12,450',
+          topContent: [
+            {
+              id: 1,
+              title: '10 AI Marketing Strategies for 2025',
+              date: 'May 1, 2025',
+              views: 24,
+              engagement: '78%',
+              icon: 'file-alt'
+            },
+            {
+              id: 2,
+              title: 'Product Launch Campaign Analysis',
+              date: 'April 28, 2025',
+              views: 18,
+              engagement: '65%',
+              icon: 'chart-bar'
+            },
+            {
+              id: 3,
+              title: 'Summer Collection Email Campaign',
+              date: 'April 25, 2025',
+              views: 32,
+              engagement: '81%',
+              icon: 'bolt'
+            }
+          ],
+          recommendations: [
+            {
+              id: 1,
+              title: 'Increase social media engagement',
+              description: 'Schedule posts during peak hours based on audience data'
+            },
+            {
+              id: 2,
+              title: 'Optimize email subject lines',
+              description: 'Use AI to test variations and improve open rates'
+            },
+            {
+              id: 3,
+              title: 'Create more video content',
+              description: 'Video engagement is 40% higher than other content types'
+            }
+          ]
         });
         setError('Note: Using demo data. Connection to database failed.');
       } finally {
@@ -95,7 +145,7 @@ const AdminDashboard = () => {
   
   const handleLogout = () => {
     localStorage.removeItem('user');
-    navigate('/login');
+    navigate('/'); // Redirect to home page instead of login page
   };
   
   if (loading) {
@@ -106,7 +156,8 @@ const AdminDashboard = () => {
       </div>
     );
   }
-    return (
+  
+  return (
     <div className="modern-admin-dashboard">
       {/* Logo and Sidebar section */}
       <div className="admin-sidebar">
@@ -116,9 +167,9 @@ const AdminDashboard = () => {
           </div>
           <h2>Mirai AI</h2>
         </div>
-          <div className="sidebar-section">
-          
-            <ul className="sidebar-menu">
+        
+        <div className="sidebar-section">
+          <ul className="sidebar-menu">
             <li className={`menu-item ${!isSubRoute ? 'active' : ''}`}>
               <Link to="/admin">
                 <i className="fas fa-th-large"></i>
@@ -162,8 +213,8 @@ const AdminDashboard = () => {
               </Link>
             </li>
             
-            <li className="menu-item">
-              <Link to="#">
+            <li className={`menu-item ${location.pathname.includes('/admin/business-planner') ? 'active' : ''}`}>
+              <Link to="/admin/business-planner">
                 <i className="fas fa-calendar-alt"></i>
                 <span>Business Planner</span>
               </Link>
@@ -177,18 +228,14 @@ const AdminDashboard = () => {
             </li>
           </ul>
         </div>
-        
-        <div className="upgrade-section">
-          <div className="upgrade-container">
-            <p>Upgrade to Pro</p>
-            <small>Unlock advanced features</small>
-          </div>
+        <div className="sidebar-footer">
         </div>
       </div>
       
       {/* Main Content Area */}
-      <div className="admin-main-content">        {/* Hide the Command Center header when on the Content Generator route */}
-        {!location.pathname.includes('/admin/content') && (
+      <div className="admin-main-content">
+        {/* Hide the Command Center header when on Content Generator or Business Planner routes */}
+        {!location.pathname.includes('/admin/content') && !location.pathname.includes('/admin/business-planner') && (
           <div className="admin-header">
             <div className="header-title">
               <div className="title-icon">
@@ -210,7 +257,8 @@ const AdminDashboard = () => {
             </div>
           </div>
         )}
-          <div className="admin-content">
+        
+        <div className="admin-content">
           {error && <div className="admin-error">{error}</div>}
           
           {/* Show bypass notice when using local admin login */}
@@ -227,45 +275,167 @@ const AdminDashboard = () => {
           ) : (
             dashboardData && (
               <>
+                {/* Stats Cards Row */}
                 <div className="stats-grid">
                   <div className="stat-card">
                     <h3>Total Users</h3>
-                    <div className="stat-value">{dashboardData.users || dashboardData.userCount || 102}</div>
+                    <div className="stat-value">{dashboardData.userCount || 2}</div>
                     <div className="stat-icon"><i className="fas fa-users"></i></div>
                   </div>
                   
                   <div className="stat-card">
                     <h3>Active Users</h3>
-                    <div className="stat-value">{dashboardData.activeUsers || 78}</div>
+                    <div className="stat-value">{dashboardData.activeUsers || 2}</div>
                     <div className="stat-icon"><i className="fas fa-user-check"></i></div>
                   </div>
                   
                   <div className="stat-card">
                     <h3>Campaigns</h3>
-                    <div className="stat-value">{dashboardData.campaigns || dashboardData.newSignups || 24}</div>
+                    <div className="stat-value">{dashboardData.campaigns || 4}</div>
                     <div className="stat-icon"><i className="fas fa-bullhorn"></i></div>
                   </div>
                 </div>
+                  {/* Top Row with Content and Recommendations Side by Side */}
+                <div className="top-section-header">
+                  <h2 className="section-title">Dashboard Overview</h2>
+                </div>
                 
-                <div className="admin-panel">
-                  <h2>Welcome to Admin Dashboard</h2>
-                  <div className="activity-list">
-                    {userData._id && userData._id.includes('admin-local-bypass') ? (
-                      <p>
-                        <strong>MongoDB Connection Bypassed:</strong> You are currently using the admin dashboard in offline mode. 
-                        This special mode was created to allow judges and evaluators to access the admin features even when MongoDB 
-                        IP whitelist restrictions prevent database access from different networks.
-                      </p>
-                    ) : (
-                      <p>This is a prototype admin dashboard. Full functionality will be implemented in the final version.</p>
-                    )}
+                <div className="dashboard-insights-row">
+                  {/* Top Performing Content */}
+                  <div className="dashboard-card insights-card">
+                    <div className="card-header">
+                      <div className="card-title">
+                        <i className="fas fa-chart-line"></i>
+                        <h3>Top Performing Content</h3>
+                      </div>
+                      <div className="card-subtitle">Highest engagement assets</div>
+                    </div>
+                    
+                    <div className="performance-list">
+                      {dashboardData.topContent && dashboardData.topContent.map(item => (
+                        <div className="performance-item" key={item.id}>
+                          <div className={`performance-icon performance-icon-${item.icon}`}>
+                            <i className={`fas fa-${item.icon}`}></i>
+                          </div>
+                          <div className="performance-details">
+                            <div className="performance-title">{item.title}</div>
+                            <div className="performance-date">{item.date}</div>
+                            <div className="performance-stats">
+                              <span><i className="fas fa-eye"></i> {item.views}</span>
+                              <span><i className="fas fa-chart-pie"></i> {item.engagement}</span>
+                            </div>
+                          </div>
+                          <div className="performance-action">
+                            <button className="view-btn">View</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                   
-                  <div className="content-navigation-note">
-                    <div className="note-icon"><i className="fas fa-lightbulb"></i></div>
-                    <div className="note-content">
-                      <h3>Content Generator Navigation</h3>
-                      <p>The Content Generator is now accessible from the sidebar menu. Click on "Content Generator" to create professional marketing content with AI.</p>
+                  {/* AI Recommendations */}
+                  <div className="dashboard-card recommendations-card">
+                    <div className="card-header">
+                      <div className="card-title">
+                        <i className="fas fa-robot"></i>
+                        <h3>AI Recommendations</h3>
+                      </div>
+                      <div className="card-subtitle">Optimization insights</div>
+                    </div>
+                    
+                    <div className="recommendations-list">
+                      {dashboardData.recommendations && dashboardData.recommendations.map(rec => (
+                        <div className="recommendation-item" key={rec.id}>
+                          <div className="recommendation-content">
+                            <div className="recommendation-title">{rec.title}</div>
+                            <div className="recommendation-description">{rec.description}</div>
+                          </div>
+                          <div className="recommendation-action">
+                            <button className="analyze-btn">
+                              <i className="fas fa-arrow-right"></i>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="analyze-wrapper">
+                      <button className="analyze-all-btn">Analyze <i className="fas fa-code"></i></button>
+                    </div>
+                  </div>
+                </div>
+                  {/* AI Tools Grid */}
+                <div className="dashboard-section">
+                  <h2 className="section-title">AI Tools</h2>
+                    <div className="ai-tools-grid">
+                    {/* Active Tools First */}
+                    <Link to="/admin/content" className="ai-tool-card active-tool">
+                      <div className="tool-icon content-tool">
+                        <i className="fas fa-file-alt"></i>
+                      </div>
+                      <div className="tool-label">
+                        <div className="tool-tag">AI TOOL</div>
+                        <h3>Content Generator</h3>
+                        <p>Create blogs, social posts and marketing materials</p>
+                      </div>
+                      <div className="tool-badge">Active</div>
+                    </Link>
+                    
+                    <Link to="/admin/business-planner" className="ai-tool-card active-tool">
+                      <div className="tool-icon plan-tool">
+                        <i className="fas fa-calendar-alt"></i>
+                      </div>
+                      <div className="tool-label">
+                        <div className="tool-tag">AI TOOL</div>
+                        <h3>Business Planner</h3>
+                        <p>Generate comprehensive business plans with AI</p>
+                      </div>
+                      <div className="tool-badge">Active</div>
+                    </Link>
+                    
+                    {/* Other Tools */}
+                    <div className="ai-tool-card">
+                      <div className="tool-icon email-tool">
+                        <i className="fas fa-envelope"></i>
+                      </div>
+                      <div className="tool-label">
+                        <div className="tool-tag">AI TOOL</div>
+                        <h3>Email Engine</h3>
+                        <p>Smart email automation with AI-powered templates</p>
+                      </div>
+                    </div>
+                    
+                    <div className="ai-tool-card">
+                      <div className="tool-icon image-tool">
+                        <i className="fas fa-image"></i>
+                      </div>
+                      <div className="tool-label">
+                        <div className="tool-tag">AI TOOL</div>
+                        <h3>AI Product Photoshoot</h3>
+                        <p>Transform regular photos into professional marketing images</p>
+                      </div>
+                    </div>
+                    
+                    <div className="ai-tool-card">
+                      <div className="tool-icon voice-tool">
+                        <i className="fas fa-microphone-alt"></i>
+                      </div>
+                      <div className="tool-label">
+                        <div className="tool-tag">AI TOOL</div>
+                        <h3>Voice Sales Agent</h3>
+                        <p>Configure AI phone agents to handle customer calls</p>
+                      </div>
+                    </div>
+                    
+                    <div className="ai-tool-card">
+                      <div className="tool-icon video-tool">
+                        <i className="fas fa-video"></i>
+                      </div>
+                      <div className="tool-label">
+                        <div className="tool-tag">AI TOOL</div>
+                        <h3>Video Generator</h3>
+                        <p>Create professional video content with AI assistance</p>
+                      </div>
                     </div>
                   </div>
                 </div>
