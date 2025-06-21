@@ -6,6 +6,7 @@ import Signup from './pages/signup.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
 import ContentGenerator from './pages/ContentGenerator.jsx'
 import UpgradeToPro from './pages/UpgradeToPro.jsx'
+import BusinessPlanner from './pages/BusinessPlanner.jsx'
 import './css/App.css'
 import './css/custom-login-fix.css'
 import './css/feature-detail.css'
@@ -17,6 +18,7 @@ import './css/registration-styles.css'
 import './css/admin-dashboard.css'
 import './css/content-generator.css'
 import './css/upgrade-pro.css'
+import './css/business-planner.css'
 import { initializeAnimations } from './components/script.js'
 
 // Protected route component
@@ -63,19 +65,20 @@ function App() {
           {/* //Fixed Fluid Elements */}
       <div className="fluid-element" id="fluid1"></div>
       <div className="fluid-element" id="fluid2"></div>
-      <div className="fluid-element" id="fluid3"></div>   
-    
-        <main>          <Routes>
+      <div className="fluid-element" id="fluid3"></div>           <main>          <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/upgrade-pro" element={<UpgradeToPro />} />
+            <Route path="/signup" element={<Signup />} />            <Route path="/upgrade-pro" element={<UpgradeToPro />} />
+            {/* Move BusinessPlanner to be nested under admin */}
             <Route 
               path="/admin" 
               element={<ProtectedRoute element={<AdminDashboard />} allowedRoles={['admin']} />}
             >
               <Route path="content" element={<ContentGenerator />} />
+              <Route path="business-planner" element={<BusinessPlanner />} />
             </Route>
+            {/* Keep this route for backward compatibility */}
+            <Route path="/business-planner" element={<Navigate to="/admin/business-planner" replace />} />
             {/* Keep this route for backward compatibility */}
             <Route
               path="/content-generator"

@@ -22,6 +22,24 @@ export const aiService = {
     }
   },
 
+  // Generate a business plan using AI
+  async generateBusinessPlan(planData) {
+    try {
+      const response = await fetch(`${AI_URL}/generate-business-plan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(planData),
+      });
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Business plan generation error:', error);
+      throw error;
+    }
+  },
+
   // Get content types available
   async getContentTypes() {
     try {

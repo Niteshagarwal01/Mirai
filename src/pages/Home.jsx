@@ -193,7 +193,18 @@ const Home = () => {
                     <div className="feature-arrow">
                         <i className="fas fa-arrow-right"></i>
                     </div>
-                </a>
+                </a>                <Link to="/business-planner" className="feature-item">
+                    <div className="feature-icon">
+                        <i className="fas fa-chart-line"></i>
+                    </div>
+                    <div className="feature-content">
+                        <h3>Business Planner</h3>
+                        <p>Create comprehensive business plans with AI that outline your vision, strategy, and execution path.</p>
+                    </div>
+                    <div className="feature-arrow">
+                        <i className="fas fa-arrow-right"></i>
+                    </div>
+                </Link>
                 <a href="pages/features/email-marketing-engine.html" className="feature-item" onClick={handleFeatureClick}>
                     <div className="feature-icon">
                         <i className="fas fa-envelope"></i>
