@@ -27,10 +27,14 @@ const Signup = () => {
         
         try {
             const response = await userService.register(formData);
-            
-            if (response.error) {
+              if (response.error) {
                 setError(response.error);
             } else {
+                // Store user count in localStorage if available
+                if (response.userCount) {
+                    localStorage.setItem('localUserCount', response.userCount.toString());
+                }
+                
                 // Registration successful, redirect to login
                 navigate('/login');
             }
@@ -153,15 +157,7 @@ const Signup = () => {
                     >
                         {loading ? "Creating Account..." : "Create Account"} {!loading && <span className="arrow-icon">→</span>}
                     </button>
-                    
-                    <div className="login-divider">
-                        <span>or continue with</span>
-                    </div>
-                    
-                    <button className="google-btn">
-                        <img src="../assets/google-logo.svg" alt="Google" />
-                        Sign up with Google
-                    </button>
+                      {/* Google sign-up removed as requested */}
                     
                     <div className="terms-text">
                         By creating an account, you agree to our <a href="#">Terms of Service</a>

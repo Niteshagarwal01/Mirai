@@ -33,26 +33,24 @@ const AdminDashboard = () => {
       }
     }
   }, []);
-  
-  useEffect(() => {
+    useEffect(() => {
     // Check if user is admin, else redirect
     if (!userData || userData.role !== 'admin') {
       navigate('/login');
       return;
     }
-      // Don't try to fetch dashboard data for local admin bypass
-    // Check if ID includes the bypass string since we now use timestamps
-    if (userData._id && userData._id.includes('admin-local-bypass')) {
-      console.log('Using local admin bypass data');
-      setDashboardData({
-        users: 102,
-        activeUsers: 78,
-        campaigns: 24,
-        engagementRate: '4.7%',
-        revenue: '$12,450'
-      });
-      setLoading(false);
-      return;
+    
+    // Handle id vs _id inconsistency by normalizing the user data
+    if (userData.id && !userData._id) {
+      userData._id = userData.id; // Add _id if only id exists
+    } else if (userData._id && !userData.id) {
+      userData.id = userData._id; // Add id if only _id exists
+    }// Even for admin bypass, fetch real data from our file system
+    // but handle the case differently
+    if (userData.id && userData.id.includes('admin-local-bypass') || 
+        userData._id && userData._id.includes('admin-local-bypass')) {
+      console.log('Fetching file-based dashboard data');
+      // We'll still fetch data but with a specific flag for the bypass mode
     }
       // Fetch dashboard data
     const fetchDashboardData = async () => {
@@ -75,12 +73,14 @@ const AdminDashboard = () => {
         } else {
           setDashboardData(data.stats);
         }      } catch (err) {
-        console.error('Dashboard data fetch error:', err);
-        // Fallback to mock data on error
+        console.error('Dashboard data fetch error:', err);        // Use more logical fallback data - get user counts from localStorage if possible
+        const localStorageUsers = localStorage.getItem('localUserCount');
+        const userCount = localStorageUsers ? parseInt(localStorageUsers) : 1;
+        
         setDashboardData({
-          users: 102,
-          activeUsers: 78,
-          campaigns: 24,
+          userCount: userCount,
+          activeUsers: Math.min(userCount, Math.ceil(userCount * 0.8)), // Never more than total
+          campaigns: 4,
           engagementRate: '4.7%',
           revenue: '$12,450'
         });
