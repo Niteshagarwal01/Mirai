@@ -11,8 +11,7 @@ import blogpostImg from '../assets/blogpost.jpeg';
 
 const ContentGenerator = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [contentTypes, setContentTypes] = useState([]);
+  const location = useLocation();  const [contentTypes, setContentTypes] = useState([]);
   const [selectedType, setSelectedType] = useState(null);
   const [prompt, setPrompt] = useState('');
   const [tone, setTone] = useState('professional');
@@ -544,21 +543,47 @@ const ContentGenerator = () => {
             )}
           </div>
         )}
-        
-        {activeTab === 'history' && (
+          {activeTab === 'history' && (
           <div className="content-history">
             <h2>Your Content History</h2>
             
             {isLoading ? (
               <div className="loading">Loading history...</div>
-            ) : contentHistory.length > 0 ? (
+            ) : error ? (
+              <div className="empty-history">
+                <i className="fas fa-exclamation-triangle"></i>
+                <p>{error}</p>
+                <button 
+                  className="create-btn"
+                  onClick={() => {
+                    setError('');
+                    fetchContentHistory();
+                  }}
+                >
+                  Retry Loading History
+                </button>
+              </div>
+            ) : contentHistory && contentHistory.length > 0 ? (
               <div className="history-list">
                 {contentHistory.map((item) => {
+                  if (!item || !item.contentType) {
+                    console.error('Invalid history item:', item);
+                    return null;
+                  }
+                  
                   // Find the matching content type to get the image
                   const typeInfo = contentTypes.find(type => type.id === item.contentType);
                   
+                  // Format date safely
+                  let formattedDate = 'Unknown date';
+                  try {
+                    formattedDate = new Date(item.createdAt).toLocaleDateString();
+                  } catch (dateError) {
+                    console.error('Error formatting date:', dateError);
+                  }
+                  
                   return (
-                    <div className="history-item" key={item.id}>
+                    <div className="history-item" key={item.id || `history-${Date.now()}-${Math.random()}`}>
                       <div className="history-header">
                         <span className="content-type-badge">
                           {typeInfo && (
@@ -571,25 +596,31 @@ const ContentGenerator = () => {
                           )}
                           {item.contentType.replace('-', ' ')}
                         </span>
-                        <span className="date">{new Date(item.createdAt).toLocaleDateString()}</span>
+                        <span className="date">{formattedDate}</span>
                       </div>
                       
                       <h3>{item.prompt}</h3>
                       
                       <div className="history-content">
-                        {item.content.split('\n').slice(0, 3).map((line, index) => (
-                          <p key={index}>{line}</p>
+                        {item.content && item.content.split('\n').slice(0, 3).map((line, index) => (
+                          <p key={index}>{line || ' '}</p>
                         ))}
-                        {item.content.split('\n').length > 3 && <p>...</p>}
+                        {item.content && item.content.split('\n').length > 3 && <p>...</p>}
                       </div>
                       
                       <button 
                         className="view-btn"
                         onClick={() => {
-                          setSelectedType(contentTypes.find(type => type.id === item.contentType));
-                          setPrompt(item.prompt);
-                          setGeneratedContent(item.content);
-                          setActiveTab('create');
+                          const matchedType = contentTypes.find(type => type.id === item.contentType);
+                          if (matchedType) {
+                            setSelectedType(matchedType);
+                            setPrompt(item.prompt || '');
+                            setGeneratedContent(item.content || '');
+                            setActiveTab('create');
+                          } else {
+                            console.error(`Could not find content type: ${item.contentType}`);
+                            setError(`Could not view content - unknown type: ${item.contentType}`);
+                          }
                         }}
                       >
                         <i className="fas fa-eye"></i> View & Edit
