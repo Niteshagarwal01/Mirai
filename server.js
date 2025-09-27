@@ -15,8 +15,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // API Keys
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyAjgMZWNZtdpiQDxm1zz5jddalLOBp_vpY';
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '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';
+const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY || '';
 
 console.log('✅ File-based DB initialized successfully');
 
@@ -185,82 +187,189 @@ app.post('/api/admin/dashboard', isAdmin, async (req, res) => {
 
 // AI Content Generation API Routes
 
-// Generate content using AI (with fallback)
-app.post('/api/ai/generate', async (req, res) => {
+// Input validation function
+function validateContentInput(req, res, next) {
+  const { contentType, prompt } = req.body;
+  
+  if (!prompt || prompt.trim().length === 0) {
+    return res.status(400).json({
+      error: 'Please provide a prompt for content generation'
+    });
+  }
+  
+  if (prompt.trim().length < 10) {
+    return res.status(400).json({
+      error: 'Please provide a more detailed prompt (at least 10 characters)'
+    });
+  }
+  
+  if (!contentType) {
+    return res.status(400).json({
+      error: 'Please select a content type'
+    });
+  }
+  
+  next();
+}
+
+// Get available AI providers
+app.get('/api/ai/providers', (req, res) => {
+  const providers = [
+    { 
+      id: 'auto', 
+      name: 'Auto (Best Available)', 
+      description: 'Automatically selects the best available AI provider',
+      status: 'available'
+    },
+    { 
+      id: 'openai', 
+      name: 'OpenAI GPT', 
+      description: 'High-quality content generation',
+      status: OPENAI_API_KEY ? 'available' : 'unavailable'
+    },
+    { 
+      id: 'gemini', 
+      name: 'Google Gemini', 
+      description: 'Fast and efficient content creation',
+      status: GEMINI_API_KEY ? 'available' : 'unavailable'
+    },
+    { 
+      id: 'groq', 
+      name: 'Groq', 
+      description: 'Fast inference AI models',
+      status: GROQ_API_KEY ? 'available' : 'unavailable'
+    },
+    { 
+      id: 'huggingface', 
+      name: 'Hugging Face', 
+      description: 'Open-source AI models',
+      status: HUGGINGFACE_API_KEY ? 'available' : 'unavailable'
+    }
+  ];
+  
+  res.status(200).json({
+    success: true,
+    providers
+  });
+});
+
+// Generate content using AI (with multiple provider support)
+app.post('/api/ai/generate', validateContentInput, async (req, res) => {
   try {
-    const { contentType, prompt, tone, length, userId } = req.body;
+    const { contentType, prompt, tone = 'professional', length = 'medium', userId, provider = 'auto' } = req.body;
     
-    console.log(`Generating ${contentType} with prompt: ${prompt}`);
+    console.log(`Generating ${contentType} with provider: ${provider}, prompt: ${prompt.substring(0, 50)}...`);
     
     // Format the prompt based on content type
-    const formattedPrompt = `
-      Create a ${contentType} with the following details:
-      Content topic: ${prompt}
-      Tone: ${tone || 'professional'}
-      Length: ${length || 'medium'}
+    const formattedPrompt = buildPrompt(contentType, prompt.trim(), tone, length);
+    
+    let result;
+    let usedProvider;
+    
+    // Determine which provider to use
+    if (provider === 'auto') {
+      // Try providers in order of preference
+      const providerOrder = ['gemini', 'groq', 'openai', 'huggingface'];
       
-      Ensure the content is engaging, well-structured, and optimized for ${contentType} format.
-      Include appropriate hashtags and formatting where relevant.
-    `;
-      // Try Gemini API first
-    try {
-      const geminiResponse = await callGeminiAPI(formattedPrompt, contentType);
-      
-      // Save to history if userId is provided
-      if (userId) {
-        // Save generation history to file DB
-        console.log(`Saving content history for user ${userId}`);
-        contentOperations.addContentHistory({
-          userId,
-          contentType,
-          prompt,
-          content: geminiResponse,
-          provider: 'gemini'
-        });
-      }
-      
-      return res.status(200).json({
-        success: true,
-        content: geminiResponse,
-        provider: 'gemini'
-      });
-    } catch (geminiError) {
-      console.error('Gemini API error, falling back to Groq:', geminiError);
-      
-      // Fallback to Groq API
-      try {
-        const groqResponse = await callGroqAPI(formattedPrompt, contentType);
-        
-        // Save to history if userId is provided
-        if (userId) {
-          // Save generation history to file DB
-          console.log(`Saving content history for user ${userId}`);
-          contentOperations.addContentHistory({
-            userId,
-            contentType,
-            prompt,
-            content: groqResponse,
-            provider: 'groq'
-          });
+      for (const prov of providerOrder) {
+        try {
+          result = await callAIProvider(prov, formattedPrompt, contentType);
+          usedProvider = prov;
+          break;
+        } catch (error) {
+          console.log(`Provider ${prov} failed, trying next...`);
+          continue;
         }
-        
-        return res.status(200).json({
-          success: true,
-          content: groqResponse,
-          provider: 'groq'
-        });
-      } catch (groqError) {
-        console.error('Groq API error:', groqError);
-        throw new Error('Both AI providers failed to generate content');
       }
+      
+      if (!result) {
+        throw new Error('All AI providers failed to generate content');
+      }
+    } else {
+      // Use specific provider
+      result = await callAIProvider(provider, formattedPrompt, contentType);
+      usedProvider = provider;
     }
+    
+    // Save to history if userId is provided
+    if (userId && result) {
+      console.log(`Saving content history for user ${userId}`);
+      contentOperations.addContentHistory({
+        userId,
+        contentType,
+        prompt: prompt.trim(),
+        content: result,
+        provider: usedProvider
+      });
+    }
+    
+    return res.status(200).json({
+      success: true,
+      content: result,
+      provider: usedProvider,
+      tokens: null // Can be implemented for token counting
+    });
+    
   } catch (error) {
     console.error('Content generation error:', error);
     res.status(500).json({
-      error: 'Failed to generate content. Please try again later.'
+      error: error.message || 'Failed to generate content. Please try again later.'
     });
   }
 });
+
+// Helper function to build prompts based on content type
+function buildPrompt(contentType, prompt, tone, length) {
+  const lengthInstructions = {
+    'short': 'Keep it concise and brief.',
+    'medium': 'Provide a moderate amount of detail.',
+    'long': 'Create comprehensive and detailed content.'
+  };
+  
+  const contentTypeInstructions = {
+    'instagram-post': 'Create an engaging Instagram post with appropriate hashtags. Include emojis where suitable.',
+    'linkedin-post': 'Write a professional LinkedIn post that drives engagement and showcases expertise.',
+    'twitter-post': 'Create a concise, engaging tweet that sparks conversation. Keep it under 280 characters.',
+    'blog-post': 'Write an in-depth blog post with proper structure, headings, and engaging content.',
+    'email-campaign': 'Create a professional email marketing campaign with subject line and body.',
+    'product-description': 'Write a compelling product description that highlights benefits and features.',
+    'business-plan': 'Create a comprehensive business plan with detailed sections and analysis.'
+  };
+  
+  return `
+You are a professional content creator. Create ${contentType.replace('-', ' ')} content with the following requirements:
+
+Topic: ${prompt}
+Tone: ${tone}
+Length: ${length} - ${lengthInstructions[length] || lengthInstructions.medium}
+
+Instructions: ${contentTypeInstructions[contentType] || 'Create engaging, high-quality content.'}
+
+Please provide only the content without any meta-commentary or explanations.
+  `.trim();
+}
+
+// Universal AI provider caller
+async function callAIProvider(provider, prompt, contentType) {
+  switch (provider) {
+    case 'openai':
+      if (!OPENAI_API_KEY) throw new Error('OpenAI API key not configured');
+      return await callOpenAIAPI(prompt, contentType);
+    case 'gemini':
+      if (!GEMINI_API_KEY) throw new Error('Gemini API key not configured');
+      return await callGeminiAPI(prompt, contentType);
+    case 'groq':
+      if (!GROQ_API_KEY) throw new Error('Groq API key not configured');
+      return await callGroqAPI(prompt, contentType);
+    case 'huggingface':
+      if (!HUGGINGFACE_API_KEY) throw new Error('Hugging Face API key not configured');
+      return await callHuggingFaceAPI(prompt, contentType);
+    default:
+      throw new Error(`Unknown AI provider: ${provider}`);
+  }
+}
+        
+
 
 // Get content types
 app.get('/api/ai/content-types', (req, res) => {
@@ -393,9 +502,49 @@ app.get('/api/stats/user-count', (req, res) => {
 });
 
 // Helper functions for AI API calls
+
+// OpenAI API caller
+async function callOpenAIAPI(prompt, contentType) {
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a professional content creator specializing in marketing copy and business content.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 1500
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.choices && data.choices[0] && data.choices[0].message) {
+      return data.choices[0].message.content;
+    } else {
+      throw new Error('Unexpected response format from OpenAI API');
+    }
+  } catch (error) {
+    console.error('OpenAI API error:', error);
+    throw error;
+  }
+}
+
+// Updated Gemini API caller
 async function callGeminiAPI(prompt, contentType) {
   try {
-    // Gemini API documentation: https://ai.google.dev/tutorials/rest_quickstart
     const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + GEMINI_API_KEY, {
       method: 'POST',
       headers: {
@@ -406,13 +555,16 @@ async function callGeminiAPI(prompt, contentType) {
           parts: [{
             text: prompt
           }]
-        }]
+        }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 1500,
+        }
       })
     });
     
     const data = await response.json();
     
-    // Extract the text from Gemini's response
     if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
       return data.candidates[0].content.parts[0].text;
     } else {
@@ -424,10 +576,10 @@ async function callGeminiAPI(prompt, contentType) {
   }
 }
 
+// Updated Groq API caller
 async function callGroqAPI(prompt, contentType) {
   try {
-    // Groq API documentation: https://console.groq.com/docs/quickstart
-    const response = await fetch('https://api.groq.com/v1/completions', {
+    const response = await fetch('https://api.groq.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${GROQ_API_KEY}`,
@@ -437,19 +589,18 @@ async function callGroqAPI(prompt, contentType) {
         model: 'llama3-8b-8192',
         messages: [{
           role: 'system',
-          content: 'You are a professional content creator specializing in marketing copy.'
+          content: 'You are a professional content creator specializing in marketing copy and business content.'
         }, {
           role: 'user',
           content: prompt
         }],
         temperature: 0.7,
-        max_tokens: 1024
+        max_tokens: 1500
       })
     });
     
     const data = await response.json();
     
-    // Extract the response text from Groq
     if (data.choices && data.choices[0] && data.choices[0].message) {
       return data.choices[0].message.content;
     } else {
@@ -457,6 +608,40 @@ async function callGroqAPI(prompt, contentType) {
     }
   } catch (error) {
     console.error('Groq API error:', error);
+    throw error;
+  }
+}
+
+// Hugging Face API caller
+async function callHuggingFaceAPI(prompt, contentType) {
+  try {
+    const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${HUGGINGFACE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: {
+          max_length: 1500,
+          temperature: 0.7,
+          return_full_text: false
+        }
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (Array.isArray(data) && data[0] && data[0].generated_text) {
+      return data[0].generated_text;
+    } else if (data.generated_text) {
+      return data.generated_text;
+    } else {
+      throw new Error('Unexpected response format from Hugging Face API');
+    }
+  } catch (error) {
+    console.error('Hugging Face API error:', error);
     throw error;
   }
 }

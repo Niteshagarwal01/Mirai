@@ -109,37 +109,59 @@ const BusinessPlanner = () => {
   };  const handleGeneratePlan = async () => {
     try {
       setIsGenerating(true);
-      // Instead of API call, generate plan locally
-      setTimeout(() => {
-        // Create a simple business plan structure based on form data
+      
+      // Validate required fields
+      const requiredFields = {
+        businessName: 'Business Name',
+        businessDescription: 'Business Description', 
+        industry: 'Industry'
+      };
+      
+      const missingFields = Object.keys(requiredFields).filter(field => 
+        !formData[field] || formData[field].trim().length === 0
+      );
+      
+      if (missingFields.length > 0) {
+        const missingFieldNames = missingFields.map(field => requiredFields[field]);
+        alert(`Please fill in the following required fields: ${missingFieldNames.join(', ')}`);
+        setIsGenerating(false);
+        return;
+      }
+      
+      // Use AI service to generate business plan
+      const planData = {
+        businessName: formData.businessName.trim(),
+        businessDescription: formData.businessDescription.trim(),
+        industry: formData.industry.trim(),
+        targetAudience: formData.targetCustomerProfile || '',
+        uniqueSellingPoints: formData.uniqueSellingProposition || '',
+        tone: 'professional'
+      };
+      
+      const response = await aiService.generateBusinessPlan(planData);
+      
+      if (response.success && response.content) {
+        // Create a business plan structure from AI response
         const generatedPlan = {
           id: Date.now().toString(),
           name: formData.businessName || 'Unnamed Business Plan',
           createdAt: new Date().toISOString(),
-          sections: {
-            executiveSummary: generateExecutiveSummary(formData),
-            businessDescription: formData.businessDescription,
-            marketAnalysis: generateMarketAnalysis(formData),
-            productDescription: formData.productDescription,
-            marketingStrategy: generateMarketingStrategy(formData),
-            financialProjections: generateFinancialProjections(formData),
-            riskAssessment: generateRiskAssessment(formData),
-          },
+          content: response.content,
+          provider: response.provider,
           status: 'completed'
         };
         
-        // Set the generated plan
         setGeneratedPlan(generatedPlan);
-        // Add the new plan to the list of plans
         setPlans([...plans, generatedPlan]);
-        // Reset the form and show the plan
         setShowCreatePlan(false);
-        setIsGenerating(false);
-      }, 1500); // Simulate loading time
+      } else {
+        alert(response.error || 'Failed to generate business plan. Please try again.');
+      }
       
     } catch (error) {
       console.error('Error generating business plan:', error);
       alert('An error occurred while generating your business plan. Please try again.');
+    } finally {
       setIsGenerating(false);
     }
   };
@@ -839,406 +861,27 @@ const BusinessPlanner = () => {
         <div className="plan-header">
           <h2>{generatedPlan.name}</h2>
           <p className="plan-date">Created on {new Date(generatedPlan.createdAt).toLocaleDateString()}</p>
+          {generatedPlan.provider && (
+            <p className="plan-provider">Generated using {generatedPlan.provider}</p>
+          )}
         </div>
         
         <div className="plan-content">
-          {/* Executive Summary */}
-          <section className="plan-section-content">
-            <h3><i className="fas fa-star"></i> Executive Summary</h3>
-            <div className="executive-summary">
-              {typeof generatedPlan.sections.executiveSummary === 'string' ? (
-                <p>{generatedPlan.sections.executiveSummary}</p>
-              ) : (
-                <>
-                  {generatedPlan.sections.executiveSummary.summary && 
-                    <p className="summary-highlight">{generatedPlan.sections.executiveSummary.summary}</p>}
-                  
-                  {generatedPlan.sections.executiveSummary.points && (
-                    <div className="highlights">
-                      <h4>Key Highlights</h4>
-                      <ul className="highlight-points">
-                        {generatedPlan.sections.executiveSummary.points.map((point, idx) => (
-                          <li key={idx}>{point}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </>
-              )}
+          <div className="plan-section-content">
+            <div className="business-plan-content">
+              <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>
+                {generatedPlan.content}
+              </pre>
             </div>
-          </section>
-          
-          {/* Business Description */}
-          <section className="plan-section-content">
-            <h3><i className="fas fa-building"></i> Business Description</h3>
-            <p>{generatedPlan.sections.businessDescription}</p>
-          </section>
-          
-          {/* Market Analysis */}
-          <section className="plan-section-content">
-            <h3><i className="fas fa-chart-pie"></i> Market Analysis</h3>
-            {typeof generatedPlan.sections.marketAnalysis === 'string' ? (
-              <p>{generatedPlan.sections.marketAnalysis}</p>
-            ) : (
-              <div className="market-analysis">
-                <div className="analysis-summary">
-                  <p>{generatedPlan.sections.marketAnalysis.summary}</p>
-                </div>
-                
-                <div className="analysis-details">
-                  <div className="customer-profile">
-                    <h4>Target Customer Profile</h4>
-                    <p>{generatedPlan.sections.marketAnalysis.targetCustomer}</p>
-                  </div>
-                  
-                  {generatedPlan.sections.marketAnalysis.marketSize && (
-                    <div className="market-size">
-                      <h4>Market Size & Growth</h4>
-                      <table className="data-table">
-                        <thead>
-                          <tr>
-                            <th>Market Value</th>
-                            <th>Growth Rate</th>
-                            <th>Opportunity</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>{generatedPlan.sections.marketAnalysis.marketSize.value}</td>
-                            <td>{generatedPlan.sections.marketAnalysis.marketSize.growth}</td>
-                            <td>{generatedPlan.sections.marketAnalysis.marketSize.opportunity}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                  
-                  {generatedPlan.sections.marketAnalysis.competitors && (
-                    <div className="competitor-analysis">
-                      <h4>Competitor Analysis</h4>
-                      {Array.isArray(generatedPlan.sections.marketAnalysis.competitors) ? (
-                        <table className="data-table">
-                          <thead>
-                            <tr>
-                              <th>#</th>
-                              <th>Competitor</th>
-                              <th>Analysis</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {generatedPlan.sections.marketAnalysis.competitors.map((comp, idx) => {
-                              const parts = comp.includes('-') ? comp.split('-') : [comp, ''];
-                              return (
-                                <tr key={idx}>
-                                  <td>{idx + 1}</td>
-                                  <td><strong>{parts[0].trim()}</strong></td>
-                                  <td>{parts[1] ? parts[1].trim() : ''}</td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      ) : (
-                        <p>{generatedPlan.sections.marketAnalysis.competitors}</p>
-                      )}
-                    </div>
-                  )}
-                  
-                  <div className="usp">
-                    <h4>Unique Selling Proposition</h4>
-                    <div className="usp-highlight">
-                      <i className="fas fa-award"></i>
-                      <p>{generatedPlan.sections.marketAnalysis.uniqueSellingProposition}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-          </section>
-          
-          {/* Product/Service Description */}
-          <section className="plan-section-content">
-            <h3><i className="fas fa-cube"></i> Product/Service Description</h3>
-            <p>{generatedPlan.sections.productDescription}</p>
-          </section>
-          
-          {/* Marketing Strategy */}
-          <section className="plan-section-content">
-            <h3><i className="fas fa-bullhorn"></i> Marketing Strategy</h3>
-            {typeof generatedPlan.sections.marketingStrategy === 'string' ? (
-              <p>{generatedPlan.sections.marketingStrategy}</p>
-            ) : (
-              <div className="marketing-strategy">
-                <p>{generatedPlan.sections.marketingStrategy.summary}</p>
-                
-                {generatedPlan.sections.marketingStrategy.marketingChannels && (
-                  <div className="strategy-section">
-                    <h4>Marketing Channels</h4>
-                    {Array.isArray(generatedPlan.sections.marketingStrategy.marketingChannels) ? (
-                      Array.isArray(generatedPlan.sections.marketingStrategy.marketingChannels) && 
-                      typeof generatedPlan.sections.marketingStrategy.marketingChannels[0] === 'object' ? (
-                        <table className="data-table">
-                          <thead>
-                            <tr>
-                              <th>Channel</th>
-                              <th>Description</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {generatedPlan.sections.marketingStrategy.marketingChannels.map((channel, idx) => (
-                              <tr key={idx}>
-                                <td><strong>{channel.name}</strong></td>
-                                <td>{channel.description}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      ) : (
-                        <ul className="strategy-list">
-                          {generatedPlan.sections.marketingStrategy.marketingChannels.map((channel, idx) => (
-                            <li key={idx}>{channel}</li>
-                          ))}
-                        </ul>
-                      )
-                    ) : (
-                      <p>{generatedPlan.sections.marketingStrategy.marketingChannels}</p>
-                    )}
-                  </div>
-                )}
-                
-                {generatedPlan.sections.marketingStrategy.growthStrategy && (
-                  <div className="strategy-section">
-                    <h4>Growth Strategy</h4>
-                    {Array.isArray(generatedPlan.sections.marketingStrategy.growthStrategy) ? (
-                      Array.isArray(generatedPlan.sections.marketingStrategy.growthStrategy) && 
-                      typeof generatedPlan.sections.marketingStrategy.growthStrategy[0] === 'object' ? (
-                        <table className="data-table">
-                          <thead>
-                            <tr>
-                              <th>Phase</th>
-                              <th>Focus</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {generatedPlan.sections.marketingStrategy.growthStrategy.map((phase, idx) => (
-                              <tr key={idx}>
-                                <td><strong>{phase.phase}</strong></td>
-                                <td>{phase.description}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      ) : (
-                        <ul className="strategy-list">
-                          {generatedPlan.sections.marketingStrategy.growthStrategy.map((strat, idx) => (
-                            <li key={idx}>{strat}</li>
-                          ))}
-                        </ul>
-                      )
-                    ) : (
-                      <p>{generatedPlan.sections.marketingStrategy.growthStrategy}</p>
-                    )}
-                  </div>
-                )}
-                
-                {generatedPlan.sections.marketingStrategy.keyMilestones && (
-                  <div className="strategy-section">
-                    <h4>Key Milestones</h4>
-                    {Array.isArray(generatedPlan.sections.marketingStrategy.keyMilestones) ? (
-                      Array.isArray(generatedPlan.sections.marketingStrategy.keyMilestones) && 
-                      typeof generatedPlan.sections.marketingStrategy.keyMilestones[0] === 'object' ? (
-                        <table className="data-table milestones-table">
-                          <thead>
-                            <tr>
-                              <th>Timeline</th>
-                              <th>Milestone</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {generatedPlan.sections.marketingStrategy.keyMilestones.map((milestone, idx) => (
-                              <tr key={idx}>
-                                <td className="milestone-time">{milestone.time}</td>
-                                <td>{milestone.goal}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      ) : (
-                        <ul className="milestone-list">
-                          {generatedPlan.sections.marketingStrategy.keyMilestones.map((item, idx) => (
-                            <li key={idx}>{item}</li>
-                          ))}
-                        </ul>
-                      )
-                    ) : (
-                      <p>{generatedPlan.sections.marketingStrategy.keyMilestones}</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </section>
-          
-          {/* Financial Projections */}
-          <section className="plan-section-content">
-            <h3><i className="fas fa-chart-line"></i> Financial Projections</h3>
-            {typeof generatedPlan.sections.financialProjections === 'string' ? (
-              <p>{generatedPlan.sections.financialProjections}</p>
-            ) : (
-              <div className="financial-projections">
-                <p className="financial-summary">{generatedPlan.sections.financialProjections.summary}</p>
-                
-                {generatedPlan.sections.financialProjections.startupCosts && (
-                  <div className="financial-section">
-                    <h4>Startup Costs</h4>
-                    {Array.isArray(generatedPlan.sections.financialProjections.startupCosts) ? (
-                      <table className="data-table financial-table">
-                        <thead>
-                          <tr>
-                            <th>Category</th>
-                            <th>Amount</th>
-                            <th>Description</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {generatedPlan.sections.financialProjections.startupCosts.map((item, idx) => (
-                            <tr key={idx}>
-                              <td><strong>{item.category}</strong></td>
-                              <td className="amount">{item.amount}</td>
-                              <td>{item.description}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    ) : (
-                      <p>{generatedPlan.sections.financialProjections.startupCosts}</p>
-                    )}
-                  </div>
-                )}
-                
-                {generatedPlan.sections.financialProjections.monthlyExpenses && (
-                  <div className="financial-section">
-                    <h4>Monthly Operating Expenses</h4>
-                    {Array.isArray(generatedPlan.sections.financialProjections.monthlyExpenses) ? (
-                      <table className="data-table financial-table">
-                        <thead>
-                          <tr>
-                            <th>Category</th>
-                            <th>Amount</th>
-                            <th>Description</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {generatedPlan.sections.financialProjections.monthlyExpenses.map((item, idx) => (
-                            <tr key={idx}>
-                              <td><strong>{item.category}</strong></td>
-                              <td className="amount">{item.amount}</td>
-                              <td>{item.description}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    ) : (
-                      <p>{generatedPlan.sections.financialProjections.monthlyExpenses}</p>
-                    )}
-                  </div>
-                )}
-                
-                {generatedPlan.sections.financialProjections.pricingModel && (
-                  <div className="financial-section">
-                    <h4>Pricing Model</h4>
-                    {Array.isArray(generatedPlan.sections.financialProjections.pricingModel) ? (
-                      <table className="data-table pricing-table">
-                        <thead>
-                          <tr>
-                            <th>Tier</th>
-                            <th>Price</th>
-                            <th>Features</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {generatedPlan.sections.financialProjections.pricingModel.map((item, idx) => (
-                            <tr key={idx}>
-                              <td><strong>{item.tier}</strong></td>
-                              <td className="price">{item.price}</td>
-                              <td>{item.features}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    ) : (
-                      <p>{generatedPlan.sections.financialProjections.pricingModel}</p>
-                    )}
-                  </div>
-                )}
-                
-                {generatedPlan.sections.financialProjections.revenueProjections && (
-                  <div className="financial-section">
-                    <h4>Revenue Projections</h4>
-                    <table className="data-table revenue-table">
-                      <thead>
-                        <tr>
-                          <th>Period</th>
-                          <th>Active Users</th>
-                          <th>Monthly Revenue</th>
-                          <th>Notes</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {generatedPlan.sections.financialProjections.revenueProjections.map((item, idx) => (
-                          <tr key={idx}>
-                            <td><strong>{item.period}</strong></td>
-                            <td className="users-count">{item.users}</td>
-                            <td className="revenue">{item.monthlyRevenue}</td>
-                            <td>{item.description}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-                
-                {generatedPlan.sections.financialProjections.breakEvenTimeframe && (
-                  <div className="breakeven-highlight">
-                    <i className="fas fa-balance-scale"></i>
-                    <p><strong>Expected Break Even:</strong> {generatedPlan.sections.financialProjections.breakEvenTimeframe}</p>
-                  </div>
-                )}
-              </div>
-            )}
-          </section>
-          
-          {/* Risk Assessment */}
-          <section className="plan-section-content">
-            <h3><i className="fas fa-exclamation-triangle"></i> Risk Assessment</h3>
-            {typeof generatedPlan.sections.riskAssessment === 'string' ? (
-              <p>{generatedPlan.sections.riskAssessment}</p>
-            ) : (
-              <div className="risk-assessment">
-                <table className="data-table risk-table">
-                  <thead>
-                    <tr>
-                      <th>Risk Factor</th>
-                      <th>Mitigation Strategy</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {generatedPlan.sections.riskAssessment.risks.map((risk, idx) => (
-                      <tr key={idx}>
-                        <td className="risk-factor"><strong>{risk.risk}</strong></td>
-                        <td>{risk.mitigation}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
+          </div>
         </div>
         
         <div className="plan-actions">
           <button className="btn btn-outline" onClick={() => { window.print(); }}>
             <i className="fas fa-print"></i> Print Plan
+          </button>
+          <button className="btn btn-secondary" onClick={() => copyPlanToClipboard(generatedPlan.content)}>
+            <i className="fas fa-copy"></i> Copy Plan
           </button>
           <button className="btn btn-primary" onClick={handleStartPlan}>
             Create Another Plan <i className="fas fa-plus"></i>
@@ -1246,6 +889,24 @@ const BusinessPlanner = () => {
         </div>
       </div>
     );
+  };
+
+  // Helper function to copy plan to clipboard
+  const copyPlanToClipboard = async (content) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      alert('Business plan copied to clipboard!');
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = content;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Business plan copied to clipboard!');
+    }
   };
   // Render loading state when generating a plan
   const renderGeneratingState = () => {
