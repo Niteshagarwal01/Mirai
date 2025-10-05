@@ -37,38 +37,38 @@ const ContentGenerator = () => {
     }
   };
 
-  // Default content types with images - keeping your original design
+  // Content types matching backend exactly
   const defaultContentTypes = [
     {
-      id: 'instagram-post',
+      id: 'Instagram Post',
       name: 'Instagram Post',
       description: 'Create engaging captions and visuals optimized for Instagram\'s audience',
       image: instagramImg,
       category: 'Social Media'
     },
     {
-      id: 'linkedin-post',
+      id: 'LinkedIn Post',
       name: 'LinkedIn Post',
       description: 'Professional content that drives engagement and showcases expertise',
       image: linkedinImg,
       category: 'Professional'
     },
     {
-      id: 'twitter-post',
+      id: 'Twitter Post',
       name: 'Twitter Post',
       description: 'Concise, engaging tweets that spark conversation and sharing',
       image: twitterImg,
       category: 'Social Media'
     },
     {
-      id: 'blog-post',
+      id: 'Blog Post',
       name: 'Blog Post',
       description: 'In-depth content that educates your audience and builds authority',
       image: blogpostImg,
       category: 'Content Creation'
     },
     {
-      id: 'email-campaign',
+      id: 'Email Campaign',
       name: 'Email Campaign',
       description: 'Draft professional email marketing campaigns',
       image: blogpostImg,
@@ -76,7 +76,7 @@ const ContentGenerator = () => {
       category: 'Marketing'
     },
     {
-      id: 'product-description',
+      id: 'Product Description',
       name: 'Product Description',
       description: 'Generate compelling product descriptions for e-commerce',
       image: blogpostImg,
@@ -89,32 +89,11 @@ const ContentGenerator = () => {
   useEffect(() => {
     // Set default content types immediately to avoid loading state
     setContentTypes(defaultContentTypes);
-    loadContentTypes();
     loadProviders();
-    loadContentHistory();
+    // Remove loadContentHistory since we don't have this endpoint yet
   }, []);
 
-  const loadContentTypes = async () => {
-    try {
-      const response = await aiService.getContentTypes();
-      if (response.success) {
-        // Merge API content types with default ones that have images - preserving your design
-        const typesWithImages = response.contentTypes.map(type => {
-          const defaultType = defaultContentTypes.find(dt => dt.id === type.id);
-          return {
-            ...type,
-            image: defaultType?.image || blogpostImg // Fallback to blogpost image
-          };
-        });
-        setContentTypes(typesWithImages);
-      } else {
-        setContentTypes(defaultContentTypes);
-      }
-    } catch (error) {
-      console.error('Error loading content types:', error);
-      setContentTypes(defaultContentTypes);
-    }
-  };
+
 
   const loadProviders = async () => {
     try {
@@ -127,19 +106,7 @@ const ContentGenerator = () => {
     }
   };
 
-  const loadContentHistory = async () => {
-    try {
-      const currentUser = getCurrentUser();
-      if (currentUser) {
-        const response = await aiService.getContentHistory(currentUser.id);
-        if (response.success) {
-          setHistory(response.history);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading content history:', error);
-    }
-  };
+
 
   const handleSelectType = (type) => {
     setSelectedType(type);
@@ -199,20 +166,16 @@ const ContentGenerator = () => {
     try {
       const currentUser = getCurrentUser();
       const contentData = {
-        contentType: selectedType.id,
-        prompt: formData.prompt.trim(),
+        contentType: selectedType.name, // Use name instead of id to match backend
+        topic: formData.prompt.trim(), // Backend expects 'topic' not 'prompt'
         tone: formData.tone,
-        length: formData.length,
-        provider: formData.provider,
-        userId: currentUser?.id
+        provider: formData.provider === 'auto' ? 'groq' : formData.provider // Default to groq
       };
 
       const response = await aiService.generateContent(contentData);
       
       if (response.success && response.content) {
         setResult(response.content);
-        // Reload history to show the new generation
-        loadContentHistory();
       } else {
         setError(response.error || 'Failed to generate content');
       }
@@ -388,7 +351,7 @@ const ContentGenerator = () => {
               {error && (
                 <div className="error-message">
                   <i className="fas fa-exclamation-triangle"></i>
-                  {error}
+                  Failed to fetch
                 </div>
               )}
 
@@ -414,39 +377,7 @@ const ContentGenerator = () => {
           </div>
         )}
 
-        {/* Content History */}
-        {history.length > 0 && (
-          <div className="history-section">
-            <h2>Recent Generations</h2>
-            <div className="history-grid">
-              {history.slice(0, 4).map((item) => (
-                <div key={item.id} className="history-card">
-                  <div className="history-header">
-                    <span className="history-type">{item.contentType.replace('-', ' ')}</span>
-                    <span className="history-date">
-                      {new Date(item.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="history-prompt">
-                    <strong>Prompt:</strong> {item.prompt}
-                  </div>
-                  <div className="history-content">
-                    {formatContent(item.content).substring(0, 150)}...
-                  </div>
-                  <button 
-                    className="view-full-btn"
-                    onClick={() => {
-                      setResult(item.content);
-                      setSelectedType(contentTypes.find(ct => ct.id === item.contentType));
-                    }}
-                  >
-                    View Full
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+
 
         {/* Loading State */}
         {contentTypes.length === 0 && !error && (

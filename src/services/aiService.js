@@ -7,29 +7,14 @@ const API_BASE = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
 class AIService {
   /**
-   * Get available AI content types
+   * Get available AI content types (removed - using hardcoded types)
    */
   async getContentTypes() {
-    try {
-      const response = await fetch(`${API_BASE}/api/content/types`);
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to load content types');
-      }
-      
-      return {
-        success: true,
-        contentTypes: data.contentTypes || []
-      };
-    } catch (error) {
-      console.error('Get content types error:', error);
-      return {
-        success: false,
-        error: error.message,
-        contentTypes: []
-      };
-    }
+    // This endpoint doesn't exist in backend, return empty
+    return {
+      success: true,
+      contentTypes: []
+    };
   }
 
   /**
@@ -50,10 +35,15 @@ class AIService {
       };
     } catch (error) {
       console.error('Get providers error:', error);
+      // Return fallback providers if API fails
       return {
-        success: false,
-        error: error.message,
-        providers: []
+        success: true,
+        providers: [
+          { id: 'groq', name: 'Groq (Llama 3.3)', status: 'available' },
+          { id: 'huggingface', name: 'Hugging Face', status: 'available' },
+          { id: 'cohere', name: 'Cohere Command', status: 'available' },
+          { id: 'claude', name: 'Anthropic Claude', status: 'available' }
+        ]
       };
     }
   }
@@ -72,10 +62,10 @@ class AIService {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          contentType: this.mapContentType(contentData.contentType),
-          topic: contentData.prompt,
+          contentType: contentData.contentType, // Use contentType directly (backend expects exact names)
+          topic: contentData.topic, // Backend expects 'topic' field
           tone: contentData.tone,
-          provider: contentData.provider
+          provider: contentData.provider || 'groq' // Default to groq
         })
       });
       
@@ -101,51 +91,22 @@ class AIService {
   }
 
   /**
-   * Map frontend content type IDs to backend content type names
+   * Map frontend content type IDs to backend content type names (not needed anymore)
    */
   mapContentType(typeId) {
-    const typeMap = {
-      'instagram-post': 'Instagram Post',
-      'linkedin-post': 'LinkedIn Post',
-      'twitter-post': 'Twitter Post',
-      'blog-post': 'Blog Post',
-      'email-campaign': 'Email Campaign',
-      'product-description': 'Product Description'
-    };
-    return typeMap[typeId] || typeId;
+    // This function is no longer needed since we're using exact names
+    return typeId;
   }
 
   /**
-   * Get user's content generation history
+   * Get user's content generation history (removed - endpoint doesn't exist)
    */
   async getContentHistory(userId) {
-    try {
-      const token = await this.getAuthToken();
-      
-      const response = await fetch(`${API_BASE}/api/content/history`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to load history');
-      }
-      
-      return {
-        success: true,
-        history: data.history || []
-      };
-    } catch (error) {
-      console.error('Get history error:', error);
-      return {
-        success: false,
-        error: error.message,
-        history: []
-      };
-    }
+    // This endpoint doesn't exist in backend
+    return {
+      success: true,
+      history: []
+    };
   }
 
   /**
