@@ -3,7 +3,7 @@
  * Handles all AI-powered content generation via backend API
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
 class AIService {
   /**
@@ -11,7 +11,7 @@ class AIService {
    */
   async getContentTypes() {
     try {
-      const response = await fetch(`${API_BASE}/content/types`);
+      const response = await fetch(`${API_BASE}/api/content/types`);
       const data = await response.json();
       
       if (!response.ok) {
@@ -37,7 +37,7 @@ class AIService {
    */
   async getAvailableProviders() {
     try {
-      const response = await fetch(`${API_BASE}/ai/providers`);
+      const response = await fetch(`${API_BASE}/api/ai/providers`);
       const data = await response.json();
       
       if (!response.ok) {
@@ -65,7 +65,7 @@ class AIService {
     try {
       const token = await this.getAuthToken();
       
-      const response = await fetch(`${API_BASE}/ai/generate`, {
+      const response = await fetch(`${API_BASE}/api/ai/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ class AIService {
     try {
       const token = await this.getAuthToken();
       
-      const response = await fetch(`${API_BASE}/content/history`, {
+      const response = await fetch(`${API_BASE}/api/content/history`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -155,7 +155,7 @@ class AIService {
     try {
       const token = await this.getAuthToken();
       
-      const response = await fetch(`${API_BASE}/ai/generate-image`, {
+      const response = await fetch(`${API_BASE}/api/ai/generate-image`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -201,7 +201,7 @@ class AIService {
       formData.append('enhancement', imageData.enhancement);
       formData.append('background', imageData.background);
       
-      const response = await fetch(`${API_BASE}/ai/enhance-image`, {
+      const response = await fetch(`${API_BASE}/api/ai/enhance-image`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -256,7 +256,7 @@ class AIService {
     try {
       const token = await this.getAuthToken();
       
-      const response = await fetch(`${API_BASE}/user/usage`, {
+      const response = await fetch(`${API_BASE}/api/user/usage`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
