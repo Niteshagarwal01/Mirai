@@ -24,6 +24,7 @@ app.use(cors({
     'http://127.0.0.1:5174',
     'https://mirai-ejxu.vercel.app',
     'https://mirai-git-main-niteshagarwal01s-projects.vercel.app',
+    'https://mirai-backend.onrender.com',
     process.env.FRONTEND_URL
   ].filter(Boolean),
   credentials: true
