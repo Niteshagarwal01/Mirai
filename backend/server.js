@@ -22,6 +22,8 @@ app.use(cors({
     'http://localhost:5174',
     'http://127.0.0.1:5173',
     'http://127.0.0.1:5174',
+    'https://mirai-ejxu.vercel.app',
+    'https://mirai-git-main-niteshagarwal01s-projects.vercel.app',
     process.env.FRONTEND_URL
   ].filter(Boolean),
   credentials: true
@@ -120,3 +122,6 @@ app.listen(PORT, () => {
   console.log(`📝 Environment: ${process.env.NODE_ENV}`);
   console.log(`🔐 Auth: Clerk | 💳 Payment: Razorpay | 🗄️ Database: Supabase`);
 });
+
+// Export for Vercel serverless
+export default app;
