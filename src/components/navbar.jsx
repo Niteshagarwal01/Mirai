@@ -10,14 +10,15 @@ const Navbar = () => {
     <nav className="floating-nav">
         <div className="nav-logo">
             <span>Mirai</span>
-        </div>        <div className="nav-links">
+        </div>
+        <div className="nav-links">
             <a href="#home" className="active">Home</a>
             <a href="#features">Features</a>
             <a href="#pricing">Pricing</a>
             <a href="#testimonials">Testimonials</a>
             <a href="#demo">Demo</a>
-        </div><div className="nav-cta">
-            <Link to="/upgrade-pro" className="btn-accent">Upgrade to Pro</Link>           
+        </div>
+        <div className="nav-cta">
             <Link to="/login" className="btn-secondary">Log In</Link>
             <Link to="/signup" className="btn-primary">Sign Up Free</Link>
         </div>

@@ -1,0 +1,32 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  clerkUserId String   @unique
+  email       String   @unique
+  plan        String   @default("free") // "free" | "pro"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  bots        Bot[]
+}
+
+model Bot {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  name      String
+  config    Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

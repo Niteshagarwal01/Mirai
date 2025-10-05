@@ -1,0 +1,26 @@
+{
+  "name": "mirai-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@clerk/clerk-sdk-node": "^4.13.0",
+    "@prisma/client": "^5.7.0",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2",
+    "openai": "^6.1.0",
+    "razorpay": "^2.9.2"
+  },
+  "devDependencies": {
+    "prisma": "^5.7.0"
+  }
+}

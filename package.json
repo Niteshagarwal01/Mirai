@@ -2,26 +2,29 @@
   "name": "mirai",
   "private": true,
   "version": "0.0.0",
-  "type": "module",  "scripts": {
+  "type": "module",
+  "scripts": {
     "dev": "vite",
-    "server": "node server.js",
-    "dev:full": "concurrently \"npm run server\" \"npm run dev\"",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "start": "node server.js",
-    "create-admin": "node create-admin-file.js",
-    "setup-filedb": "node create-admin-file.js"
+    "preview": "vite preview"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.49.1",
+    "@clerk/clerk-sdk-node": "^4.13.23",
+    "@prisma/client": "^6.16.3",
     "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "mongodb": "^6.20.0",
     "mongoose": "^8.16.0",
     "node-fetch": "^3.3.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",
+    "stripe": "^19.0.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
@@ -34,6 +37,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
+    "prisma": "^6.16.3",
     "vite": "^6.3.5"
   }
 }

@@ -18,8 +18,14 @@
 .upgrade-pro-page {
   background-color: var(--bg-dark);
   min-height: 100vh;
+  width: 100vw;
+  max-width: 100%;
   color: var(--text-main);
   background-image: radial-gradient(circle at 50% 50%, rgba(110, 64, 255, 0.15) 0%, transparent 60%);
+  position: relative;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 .upgrade-header {
@@ -181,8 +187,9 @@
 
 @media (min-width: 992px) {
   .upgrade-content {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 2fr 1fr;
     padding: 0;
+    gap: 40px;
   }
 }
 
@@ -239,15 +246,40 @@
   border-radius: 20px;
   font-size: 0.7rem;
   color: var(--bg-dark);
+  .glass-card {
+    background: rgba(20, 20, 35, 0.55);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: box-shadow 0.3s, background 0.3s;
+  }
+  .glass-card:hover {
+    box-shadow: 0 16px 40px 0 rgba(110, 64, 255, 0.25);
+    background: rgba(20, 20, 35, 0.7);
+  }
   margin-left: 5px;
   font-weight: 700;
 }
 
 .plan-cards {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 30px;
   margin-top: 40px;
+}
+
+@media (max-width: 1200px) {
+  .plan-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .plan-cards {
+    grid-template-columns: 1fr;
+  }
 }
 
 .plan-card {
@@ -784,148 +816,231 @@
   font-size: 1rem;
 }
 
-/* Select Plan Button */
-.select-plan-button {
-  display: block;
-  width: 100%;
-  padding: 18px;
-  text-align: center;
-  background: linear-gradient(to right, var(--primary), var(--accent));
-  color: white;
-  font-weight: 600;
-  font-size: 1.1rem;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(110, 64, 255, 0.3);
-  margin-top: 30px;
-}
-
-.select-plan-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(110, 64, 255, 0.4);
-}
-
-.select-plan-button:active {
-  transform: translateY(1px);
-}
-
-/* Testimonials Section */
-.testimonials-section {
+/* ===== Pricing Section in Upgrade Page ===== */
+.upgrade-pricing {
+  background-color: transparent;
   padding: 60px 0;
-  background: rgba(10, 10, 20, 0.3);
-  position: relative;
-  overflow: hidden;
+  margin-bottom: 80px;
 }
 
-.testimonials-title {
-  font-size: 2rem;
+/* Features Comparison Section */
+.features-comparison {
+  padding: 60px 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(20, 20, 31, 0.5) 100%);
+}
+
+.features-comparison .section-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 50px;
+}
+
+.features-comparison .section-header h2 {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+
+.features-comparison .section-header p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+
+.benefit-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 35px;
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.benefit-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(110, 64, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(110, 64, 255, 0.2);
+}
+
+.benefit-icon {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, rgba(110, 64, 255, 0.2), rgba(52, 255, 233, 0.2));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 28px;
+  color: var(--accent);
+  transition: all 0.3s ease;
+}
+
+.benefit-card:hover .benefit-icon {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
   color: var(--text-main);
 }
 
-.testimonials-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 30px;
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 20px;
+.benefit-card h3 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  color: var(--text-main);
 }
 
-@media (min-width: 768px) {
-  .testimonials-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.testimonial-card {
-  background-color: rgba(20, 20, 35, 0.5);
-  padding: 30px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  position: relative;
-}
-
-.testimonial-content {
-  position: relative;
-  padding: 20px 0;
+.benefit-card p {
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 0.95rem;
   line-height: 1.6;
+  margin: 0;
+}
+
+.upgrade-pricing .pricing-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.upgrade-pricing .pricing-card {
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 40px 30px;
+  border: 1px solid var(--border);
+  transition: var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.upgrade-pricing .pricing-card.featured {
+  transform: scale(1.05);
+  border: 1px solid rgba(52, 255, 233, 0.2);
+  box-shadow: var(--shadow-md);
+}
+
+.upgrade-pricing .pricing-card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(110, 64, 255, 0.3);
+}
+
+.upgrade-pricing .pricing-card.featured:hover {
+  transform: scale(1.05) translateY(-10px);
+}
+
+.upgrade-pricing .popular-tag {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: linear-gradient(45deg, var(--primary), var(--accent));
+  color: var(--text-main);
+  font-size: 0.75rem;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.upgrade-pricing .pricing-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.upgrade-pricing .pricing-header h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+.upgrade-pricing .price {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.upgrade-pricing .price span {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-tertiary);
+}
+
+.upgrade-pricing .pricing-features {
+  margin-bottom: 30px;
+  min-height: 280px;
+}
+
+.upgrade-pricing .package-description {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
   font-style: italic;
 }
 
-.testimonial-content:before {
-  content: '"';
-  position: absolute;
-  top: -10px;
-  left: -10px;
-  font-size: 60px;
-  color: rgba(110, 64, 255, 0.2);
-  font-family: serif;
+.upgrade-pricing .pricing-features ul {
+  list-style: none;
+  padding: 0;
 }
 
-.testimonial-author {
+.upgrade-pricing .pricing-features ul li {
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
   display: flex;
-  align-items: center;
-  margin-top: 20px;
+  align-items: flex-start;
+  line-height: 1.5;
 }
 
-.author-avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: var(--bg-card-hover);
-  overflow: hidden;
-  margin-right: 15px;
-}
-
-.author-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.author-info h4 {
-  color: var(--text-main);
-  margin: 0 0 5px;
-  font-size: 1.1rem;
-}
-
-.author-info p {
-  color: var(--text-tertiary);
-  margin: 0;
+.upgrade-pricing .pricing-features ul li i {
+  color: var(--success);
+  margin-right: 10px;
   font-size: 0.9rem;
+  margin-top: 3px;
+  flex-shrink: 0;
 }
 
-/* Responsive Styles */
+.upgrade-pricing .btn-primary {
+  display: block;
+  text-align: center;
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(45deg, var(--primary), #8956ff);
+  border: none;
+  color: var(--text-main);
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 15px rgba(110, 64, 255, 0.3);
+}
+
+.upgrade-pricing .btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(110, 64, 255, 0.5);
+}
+
 @media (max-width: 992px) {
-  .upgrade-content {
-    grid-template-columns: 1fr;
+  .upgrade-pricing .pricing-cards {
+    grid-template-columns: repeat(2, 1fr);
   }
-
-  .benefits-list {
-    grid-template-columns: 1fr;
+  
+  .upgrade-pricing .pricing-card.featured {
+    transform: none;
   }
-
-  .faq-items {
-    grid-template-columns: 1fr;
+  
+  .upgrade-pricing .pricing-card.featured:hover {
+    transform: translateY(-10px);
   }
 }
 
 @media (max-width: 768px) {
-  .upgrade-hero h1 {
-    font-size: 2.5rem;
+  .upgrade-pricing .pricing-cards {
+    grid-template-columns: 1fr;
   }
-
-  .form-row {
-    flex-direction: column;
-  }
-
-  .plan-card {
-    padding: 20px;
+  
+  .upgrade-pricing .pricing-features {
+    min-height: auto;
   }
 }

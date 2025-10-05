@@ -1,0 +1,96 @@
+=====================================
+MIRAI BACKEND SETUP - RAZORPAY
+=====================================
+
+DATABASE: PostgreSQL (NOT MongoDB)
+
+=====================================
+WHAT TO FILL IN .env FILES
+=====================================
+
+FRONTEND (.env):
+----------------
+VITE_BACKEND_URL=http://localhost:3001
+
+
+BACKEND (backend/.env):
+-----------------------
+RAZORPAY_KEY_ID=rzp_test_xxxxx
+RAZORPAY_KEY_SECRET=your_secret_here
+DATABASE_URL="postgresql://postgres:password@localhost:5432/mirai"
+PORT=3001
+FRONTEND_URL=http://localhost:5173
+FREE_BOT_LIMIT=3
+PRO_PLAN_PRICE=4900
+
+Get Razorpay keys from: https://dashboard.razorpay.com → Settings → API Keys
+
+
+=====================================
+PRICING (UPDATED - ALL UNDER $100)
+=====================================
+
+Starter Plan:    $19/month (annual) or $29/month
+Professional:    $39/month (annual) or $49/month ⭐ Most Popular
+Enterprise:      $79/month (annual) or $99/month
+
+
+=====================================
+API ENDPOINTS CREATED
+=====================================
+
+POST /api/auth/signup - Register user
+POST /api/auth/login - Login user
+POST /api/checkout - Create Razorpay order
+POST /api/payment/verify - Verify payment
+POST /api/bots/create - Create bot (quota enforced)
+GET /api/bots - List bots
+DELETE /api/bots/:id - Delete bot
+GET /api/user/me - Get user profile
+GET /api/user/plan - Get plan status
+
+
+=====================================
+INSTALLATION STEPS
+=====================================
+
+1. Install PostgreSQL:
+   docker run --name mirai-postgres -e POSTGRES_PASSWORD=password -e POSTGRES_DB=mirai -p 5432:5432 -d postgres
+
+2. Install backend:
+   cd backend
+   npm install
+   npm run prisma:migrate
+   npm run dev
+
+3. Install frontend:
+   npm run dev
+
+
+=====================================
+RAZORPAY LINKS
+=====================================
+
+Sign up: https://dashboard.razorpay.com/signup
+Get API Keys: https://dashboard.razorpay.com/app/keys
+Test Cards: https://razorpay.com/docs/payments/payments/test-card-details/
+
+Test Card Number: 4111 1111 1111 1111
+CVV: Any 3 digits
+Expiry: Any future date
+
+
+=====================================
+HOW IT WORKS
+=====================================
+
+1. User signs up/logs in (saved to PostgreSQL)
+2. User can create up to 3 bots (free plan)
+3. Click "Pay with Razorpay" to upgrade
+4. Razorpay popup opens for payment
+5. After payment, user upgraded to Pro (unlimited bots)
+
+
+=====================================
+DONE! ALL FILES UPDATED
+=====================================

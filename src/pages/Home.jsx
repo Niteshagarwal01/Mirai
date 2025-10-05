@@ -8,77 +8,19 @@ import image from '../assets/image.png'
 import reactSvg from '../assets/react.svg'
 
 const Home = () => {
-    // State to control notification visibility
-    const [showNotification, setShowNotification] = useState(true);
-    // State for admin login modal
-    const [showAdminModal, setShowAdminModal] = useState(false);
-    
     const navigate = useNavigate();
     
-    // Load visibility state from localStorage when component mounts
-    useEffect(() => {
-        const isHidden = localStorage.getItem('hidePrototypeNotification') === 'true';
-        setShowNotification(!isHidden);
-    }, []);
-    
-    // Function to hide notification and save state to localStorage
-    const hideNotification = () => {
-        setShowNotification(false);
-        localStorage.setItem('hidePrototypeNotification', 'true');
-    };
-      // Function to handle feature box clicks
+    // Handle feature link clicks
     const handleFeatureClick = (e) => {
         e.preventDefault();
-        e.stopPropagation();
-        setShowAdminModal(true);
-    };
-    
-    // Function to close the admin modal
-    const closeAdminModal = () => {
-        setShowAdminModal(false);
-    };
-    
-    // Function to redirect to login page
-    const goToAdminLogin = () => {
-        setShowAdminModal(false);
-        navigate('/login');
+        // For now, just prevent default - these pages don't exist yet
+        console.log('Feature clicked:', e.currentTarget.href);
+        // You can navigate to these pages when they're created
     };
     
     return (
     <div className="home">
     <Navbar/>
-    
-    {/* Prototype Notification Box */}
-    {showNotification && (
-        <div className="prototype-note">
-            <div className="prototype-note-content">
-                <i className="fas fa-info-circle"></i>
-                <div className="prototype-note-text">
-                    <h4>Prototype Access</h4>
-                    <p>For full feature access, <Link to="/login">log in</Link> with admin credentials (email: admin@mirai.com, password: Admin@123)</p>
-                </div>
-                <button className="close-note" onClick={hideNotification}>
-                    <i className="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-    )}
-      {/* Admin Login Modal */}
-    {showAdminModal && (
-        <div className="admin-modal-overlay">
-            <div className="admin-modal">
-                <div className="admin-modal-content">
-                    <h3>Admin Access Required</h3>
-                    <p>This feature is available only for hackathon judges. Please log in with admin credentials:</p>
-                    <p><strong>Email:</strong> admin@mirai.com <strong>Password:</strong> Admin@123</p>
-                    <div className="admin-modal-buttons">
-                        <button className="btn-secondary" onClick={closeAdminModal}>Cancel</button>
-                        <button className="btn-primary" onClick={goToAdminLogin}>Login as Admin</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )}
     
       {/* //-- Hero Section -- */}
     <section id="home" className="hero">
@@ -241,8 +183,8 @@ const Home = () => {
             </div>            <div className="pricing-cards">
                 <div className="pricing-card">
                     <div className="pricing-header">
-                        <h3>Starter Package</h3>
-                        <div className="price">$99<span>/month</span></div>
+                        <h3>Starter</h3>
+                        <div className="price">₹1,577<span>/month</span></div>
                     </div>
                     <div className="pricing-features">
                         <p className="package-description">For new startups just beginning their journey</p>
@@ -252,13 +194,13 @@ const Home = () => {
                             <li><i className="fas fa-check"></i> Content generation (10 pieces/month)</li>
                             <li><i className="fas fa-check"></i> Essential analytics dashboard</li>
                         </ul>
-                    </div>                    <Link to="/upgrade-pro" className="btn-primary">Upgrade Now</Link>
+                    </div>
                 </div>
                 <div className="pricing-card featured">
                     <div className="popular-tag">Most Popular</div>
                     <div className="pricing-header">
-                        <h3>Professional Package</h3>
-                        <div className="price">$249<span>/month</span></div>
+                        <h3>Professional</h3>
+                        <div className="price">₹3,237<span>/month</span></div>
                     </div>
                     <div className="pricing-features">
                         <p className="package-description">For growing startups with established needs</p>
@@ -269,12 +211,11 @@ const Home = () => {
                             <li><i className="fas fa-check"></i> Enhanced analytics with reporting</li>
                             <li><i className="fas fa-check"></i> 3D model generation (10/month)</li>
                         </ul>                    </div>
-                    <Link to="/upgrade-pro" className="btn-primary">Upgrade Now</Link>
                 </div>
                 <div className="pricing-card">
                     <div className="pricing-header">
-                        <h3>Enterprise Package</h3>
-                        <div className="price">$599<span>/month</span></div>
+                        <h3>Enterprise</h3>
+                        <div className="price">₹6,557<span>/month</span></div>
                     </div>
                     <div className="pricing-features">
                         <p className="package-description">For scaling startups with complex needs</p>
@@ -287,7 +228,6 @@ const Home = () => {
                             <li><i className="fas fa-check"></i> Priority technical support</li>
                             <li><i className="fas fa-check"></i> API access for custom integrations</li>
                         </ul>                    </div>
-                    <Link to="/upgrade-pro" className="btn-primary">Upgrade Now</Link>
                 </div>
             </div>
         </div>
@@ -484,10 +424,15 @@ const Home = () => {
                     </div>
                 </div>                <div className="demo-video-container">
                     <div className="video-wrapper">
-                        <img src="assets/images/demo" alt="Mirai Dashboard Demo" className="demo-placeholder"/>
-                        <div className="play-button">
-                            <i className="fas fa-play"></i>
-                        </div>
+                        <video
+                            src="/Recording 2025-09-27 220945.mp4"
+                            controls
+                            className="demo-video"
+                            width="100%"
+                            poster={BlackModernWorldNoTobaccoDayInstagramPost}
+                        >
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { aiService } from '../services/aiService';
+import aiService from '../services/aiService.js';
 import '../css/content-generator.css';
 
 // Import images directly - keeping your original design

@@ -20,11 +20,16 @@ body.auth-page::before {
 
 .login-container {
     display: flex;
+    min-height: 100vh;
     height: 100vh;
-    width: 100%;
+    width: 100vw;
+    max-width: 100%;
     background: transparent;
-    position: relative;
-    z-index: 1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    overflow: hidden;
 }
 
 .login-left {
@@ -35,7 +40,19 @@ body.auth-page::before {
     display: flex;
     flex-direction: column;
     border-right: 1px solid rgba(52, 255, 233, 0.1);
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+.login-right {
+    width: 55%;
+    padding: 30px 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+    overflow-x: hidden;
     box-sizing: border-box;
 }
 
@@ -68,8 +85,11 @@ body.auth-page::before {
 .login-content h3 {
     font-size: 22px;
     margin-bottom: 20px;
-    line-height: 1.3;
+    line-height: 1.5;
     color: rgba(255, 255, 255, 0.9);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 .feature-list {
@@ -91,6 +111,16 @@ body.auth-page::before {
     background: rgba(52, 255, 233, 0.05);
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(52, 255, 233, 0.1);
+}
+
+.feature-highlight-box p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 .login-feature {
@@ -348,31 +378,210 @@ body.auth-page::before {
 .login-right {
     width: 55%;
     display: flex;
-    margin-top: 0px;
     justify-content: center;
     align-items: center;
-    padding: 60px;
+    padding: 70px 50px;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .login-form-container {
-    margin-top: 0px;
-    max-width: 400px;
+    max-width: 420px;
     width: 100%;
+    padding: 0;
 }
 
 .login-form-container h2 {
-    font-size: 32px;
-    margin-bottom: 8px;
+    font-size: 36px;
+    margin-bottom: 12px;
     color: #fff;
+    font-weight: 700;
+    letter-spacing: -0.5px;
 }
 
 .access-text {
-    color: #6e40ff;
+    background: linear-gradient(135deg, #6e40ff 0%, #34ffe9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .login-subtitle {
     color: #c4c4ce;
-    margin-bottom: 40px;
+    margin-bottom: 28px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Form Styles */
+.login-form {
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    backdrop-filter: blur(10px);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #6e40ff;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(110, 64, 255, 0.1);
+}
+
+.form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    margin-top: -8px;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    cursor: pointer;
+    accent-color: #6e40ff;
+}
+
+.checkbox-container span {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.forgot-link {
+    color: #34ffe9;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.forgot-link:hover {
+    color: #5afff0;
+    text-decoration: underline;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 15px 24px;
+    background: linear-gradient(135deg, #6e40ff 0%, #5230d1 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(110, 64, 255, 0.4);
+    margin-bottom: 24px;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #7f51ff 0%, #6340e1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(110, 64, 255, 0.5);
+}
+
+.submit-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.submit-btn i {
+    font-size: 16px;
+}
+
+.error-message {
+    background: rgba(255, 82, 82, 0.1);
+    border: 1px solid rgba(255, 82, 82, 0.3);
+    border-left: 3px solid #ff5252;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    color: #ff8a8a;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.signup-link {
+    text-align: center;
+    margin-top: 20px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+}
+
+.signup-link a {
+    color: #6e40ff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #6e40ff 0%, #34ffe9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
 }
 
 .form-field {
@@ -567,6 +776,105 @@ body.auth-page::before {
 
 .admin-login-hint strong {
   color: var(--text-main);
+}
+
+/* Divider between form and OAuth */
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0 16px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.divider span {
+  padding: 0 16px;
+}
+
+/* Google OAuth Button */
+.google-btn {
+  width: 100%;
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+  margin-bottom: 16px;
+}
+
+.google-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.google-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Custom Scrollbar */
+.login-left::-webkit-scrollbar,
+.login-right::-webkit-scrollbar {
+  width: 6px;
+}
+
+.login-left::-webkit-scrollbar-track,
+.login-right::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.login-left::-webkit-scrollbar-thumb,
+.login-right::-webkit-scrollbar-thumb {
+  background: rgba(110, 64, 255, 0.3);
+  border-radius: 10px;
+}
+
+.login-left::-webkit-scrollbar-thumb:hover,
+.login-right::-webkit-scrollbar-thumb:hover {
+  background: rgba(110, 64, 255, 0.5);
+}
+
+/* Feature Highlight Box */
+.feature-highlight-box {
+  background: rgba(52, 255, 233, 0.03);
+  border: 1px solid rgba(52, 255, 233, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feature-highlight-box:hover {
+  background: rgba(52, 255, 233, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(52, 255, 233, 0.1);
+}
+
+.feature-highlight-box p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 /* Responsive styles */

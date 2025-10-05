@@ -1,9 +1,23 @@
+/**
+ * Clerk Integration Setup Guide
+ * 
+ * Step 1: Install Clerk
+ * npm install @clerk/clerk-react
+ * 
+ * Step 2: Get your Clerk Publishable Key from https://dashboard.clerk.com
+ * 
+ * Step 3: Add to your .env file:
+ * VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
+ * VITE_BACKEND_URL=http://localhost:3001
+ * 
+ * Step 4: Update src/main.jsx to wrap app with ClerkProvider
+ */
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ClerkProvider } from '@clerk/clerk-react';
 import App from './App.jsx';
-import ErrorBoundary from './ErrorBoundary.jsx';
 import './css/index.css';
 
 // Get Clerk publishable key from environment
@@ -16,12 +30,10 @@ if (!CLERK_PUBLISHABLE_KEY) {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ErrorBoundary>
-      <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </ClerkProvider>
-    </ErrorBoundary>
+    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ClerkProvider>
   </React.StrictMode>
 );
