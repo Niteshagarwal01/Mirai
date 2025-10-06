@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import aiService from '../services/aiService';
 import '../css/business-planner.css';
 
 const BusinessPlanner = () => {

@@ -10,6 +10,7 @@ import ContentGenerator from './pages/ContentGenerator.jsx'
 import UpgradeToPro from './pages/UpgradeToPro.jsx'
 import PaymentPage from './pages/PaymentPage.jsx'
 import BusinessPlanner from './pages/BusinessPlanner.jsx'
+import { NotFound } from './ErrorBoundary.jsx'
 import './css/App.css'
 import './css/custom-login-fix.css'
 import './css/feature-detail.css'
@@ -140,6 +141,7 @@ function App() {
             path="/admin" 
             element={<ProtectedRoute element={<AdminDashboard />} />}
           >
+            <Route index element={<AdminDashboard />} />
             <Route path="content" element={<ContentGenerator />} />
             <Route path="business-planner" element={<BusinessPlanner />} />
           </Route>
@@ -147,6 +149,9 @@ function App() {
           {/* Backward compatibility */}
           <Route path="/business-planner" element={<Navigate to="/admin/business-planner" replace />} />
           <Route path="/content-generator" element={<Navigate to="/admin/content" replace />} />
+          
+          {/* 404 route */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
     </div>

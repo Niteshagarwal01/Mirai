@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -14,5 +15,27 @@ export default defineConfig({
         secure: false,
       }
     }
+  },
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src')
+    }
+  },
+  build: {
+    outDir: 'dist',
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+      },
+    },
+  },
+  // Add proper history API fallback for client-side routing
+  preview: {
+    port: 5174,
+    strictPort: true,
+    host: true,
+    headers: {
+      'Cache-Control': 'no-store',
+    },
   }
 })

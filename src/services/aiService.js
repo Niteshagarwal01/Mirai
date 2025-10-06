@@ -6,16 +6,6 @@
 const API_BASE = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
 class AIService {
-  /**
-   * Get available AI content types (removed - using hardcoded types)
-   */
-  async getContentTypes() {
-    // This endpoint doesn't exist in backend, return empty
-    return {
-      success: true,
-      contentTypes: []
-    };
-  }
 
   /**
    * Get available AI providers (OpenAI, Claude, etc.)
@@ -88,25 +78,6 @@ class AIService {
         error: error.message
       };
     }
-  }
-
-  /**
-   * Map frontend content type IDs to backend content type names (not needed anymore)
-   */
-  mapContentType(typeId) {
-    // This function is no longer needed since we're using exact names
-    return typeId;
-  }
-
-  /**
-   * Get user's content generation history (removed - endpoint doesn't exist)
-   */
-  async getContentHistory(userId) {
-    // This endpoint doesn't exist in backend
-    return {
-      success: true,
-      history: []
-    };
   }
 
   /**
@@ -207,6 +178,55 @@ class AIService {
     } catch (error) {
       console.error('Get auth token error:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Generate business plan using AI
+   */
+  async generateBusinessPlan(planData) {
+    try {
+      const token = await this.getAuthToken();
+      
+      // Format the business plan prompt
+      const businessPlanPrompt = `Create a comprehensive business plan for "${planData.businessName}".
+      
+Business Description: ${planData.businessDescription}
+Industry: ${planData.industry}
+Target Audience: ${planData.targetAudience || 'General audience'}
+Unique Selling Points: ${planData.uniqueSellingPoints || 'To be defined'}`;
+
+      const response = await fetch(`${API_BASE}/api/ai/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          contentType: 'Business Plan', // Use specific content type for business plans
+          topic: businessPlanPrompt,
+          tone: planData.tone || 'professional',
+          provider: 'groq' // Default to groq for business plans
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate business plan');
+      }
+      
+      return {
+        success: true,
+        content: data.content,
+        provider: data.metadata?.provider || 'groq'
+      };
+    } catch (error) {
+      console.error('Generate business plan error:', error);
+      return {
+        success: false,
+        error: error.message
+      };
     }
   }
 

@@ -66,7 +66,30 @@ Requirements:
 - Highlight key features and benefits
 - Address customer pain points
 - Include compelling call-to-action
-- Tone: ${tone || 'persuasive and benefits-focused'}`
+- Tone: ${tone || 'persuasive and benefits-focused'}`,
+
+  'Business Plan': (topic, tone) => `Create a comprehensive business plan based on the following information: ${topic}
+
+Requirements:
+- Create a detailed, professional business plan
+- Include the following sections:
+  1. Executive Summary
+  2. Company Description  
+  3. Market Analysis
+  4. Organization & Management
+  5. Service or Product Line
+  6. Marketing & Sales Strategy
+  7. Funding Request (if applicable)
+  8. Financial Projections
+  9. Risk Assessment & Mitigation
+- Use professional business language
+- Include specific, actionable recommendations
+- Format with clear headings and bullet points
+- Provide realistic projections and timelines
+- Address potential challenges and solutions
+- Tone: ${tone || 'professional and authoritative'}
+- Length: Comprehensive (1500-2500 words)
+- Structure the content with proper formatting for readability`
 };
 
 // Groq API call

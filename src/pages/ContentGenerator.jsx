@@ -24,7 +24,6 @@ const ContentGenerator = () => {
   const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [history, setHistory] = useState([]);
 
   // Get user ID from localStorage or session
   const getCurrentUser = () => {
@@ -90,7 +89,6 @@ const ContentGenerator = () => {
     // Set default content types immediately to avoid loading state
     setContentTypes(defaultContentTypes);
     loadProviders();
-    // Remove loadContentHistory since we don't have this endpoint yet
   }, []);
 
 
@@ -351,7 +349,7 @@ const ContentGenerator = () => {
               {error && (
                 <div className="error-message">
                   <i className="fas fa-exclamation-triangle"></i>
-                  Failed to fetch
+                  {error}
                 </div>
               )}
 
@@ -393,7 +391,7 @@ const ContentGenerator = () => {
             <i className="fas fa-exclamation-triangle"></i>
             <h3>Unable to Load Content Types</h3>
             <p>{error}</p>
-            <button onClick={loadContentTypes} className="retry-btn">
+            <button onClick={() => window.location.reload()} className="retry-btn">
               <i className="fas fa-redo"></i>
               Retry
             </button>

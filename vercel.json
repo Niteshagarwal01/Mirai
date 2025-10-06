@@ -1,0 +1,28 @@
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "routes": [
+    { "src": "/admin", "dest": "/index.html" },
+    { "src": "/admin/(.*)", "dest": "/index.html" },
+    { "src": "/login", "dest": "/index.html" },
+    { "src": "/signup", "dest": "/index.html" },
+    { "src": "/payment", "dest": "/index.html" },
+    { "src": "/business-planner", "dest": "/index.html" },
+    { "src": "/content-generator", "dest": "/index.html" },
+    { "src": "/upgrade-pro", "dest": "/index.html" },
+    { "src": "/sso-callback", "dest": "/index.html" }
+  ],
+  "trailingSlash": false,
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
+}
