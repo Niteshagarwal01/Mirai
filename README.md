@@ -70,25 +70,21 @@ A comprehensive AI-powered content generation and business planning platform tha
 
 ## 📸 Screenshots
 
-### Home Page
-![Home Page](screenshots/home-page.png)
-*Modern landing page with feature showcase*
+<img width="1919" height="976" alt="Screenshot 2025-10-05 163221" src="https://github.com/user-attachments/assets/37844322-501f-4558-9852-81e1f23fb477" />
 
-### Content Generator
-![Content Generator](screenshots/content-generator.png)
-*AI-powered content generation interface*
-
-### Business Planner
-![Business Planner](screenshots/business-planner.png)
-*Comprehensive business plan generation*
-
-### Admin Dashboard
-![Admin Dashboard](screenshots/admin-dashboard.png)
-*Administrative control panel*
-
-### User Dashboard
-![User Dashboard](screenshots/user-dashboard.png)
-*Personalized user interface*
+<img width="1919" height="971" alt="Screenshot 2025-10-05 163234" src="https://github.com/user-attachments/assets/81e0821b-1ccf-4019-acc0-ec1540902e13" />
+<img width="1913" height="974" alt="Screenshot 2025-10-05 163243" src="https://github.com/user-attachments/assets/93e4cf44-5d0e-4466-a9c1-2455ca33da51" />
+<img width="1919" height="928" alt="Screenshot 2025-10-05 163354" src="https://github.com/user-attachments/assets/706d72fb-d199-4235-a5c8-3010505208a7" />
+<img width="1916" height="937" alt="Screenshot 2025-10-05 163337" src="https://github.com/user-attachments/assets/4537dad0-8d96-4436-97e0-2fc2c0ea0467" />
+<img width="1919" height="970" alt="Screenshot 2025-10-05 163326" src="https://github.com/user-attachments/assets/153d7af6-de62-40eb-bc27-2e7bba6d870a" />
+<img width="1919" height="966" alt="Screenshot 2025-10-05 163302" src="https://github.com/user-attachments/assets/718e9afa-460d-495c-86b8-223267c41631" />
+<img width="1919" height="1024" alt="Screenshot 2025-10-05 172204" src="https://github.com/user-attachments/assets/359bae15-2ed1-4ce0-bfa4-17ce100a5283" />
+<img width="1919" height="1020" alt="Screenshot 2025-10-05 172145" src="https://github.com/user-attachments/assets/8cff0e4f-a762-4149-b01f-b0e2da0ece2a" />
+<img width="1915" height="975" alt="Screenshot 2025-10-05 172024" src="https://github.com/user-attachments/assets/0e227fc7-b181-40ba-9f26-7262a6f93365" />
+<img width="1919" height="1062" alt="Screenshot 2025-10-05 173907" src="https://github.com/user-attachments/assets/893fd1b1-206b-41d3-9987-0b9c5975bf5f" />
+<img width="1919" height="1079" alt="Screenshot 2025-06-21 221738" src="https://github.com/user-attachments/assets/d8c81c8a-abc8-49c4-a090-d75f8d1c46c9" />
+<img width="1919" height="1079" alt="Screenshot 2025-06-21 210919" src="https://github.com/user-attachments/assets/d42055dc-cf59-4d2a-b915-1b6176c70307" />
+<img width="1919" height="1079" alt="Screenshot 2025-06-21 200912" src="https://github.com/user-attachments/assets/5a073e63-3341-4d50-b520-06bebcca27ef" />
 
 ## 🔧 Local Development Setup
 
