@@ -1,0 +1,20 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# If an existing asset or directory is requested go to it as it is
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d
+RewriteRule ^ - [L]
+
+# Handle client-side routes - these routes should serve the index.html
+RewriteRule ^admin(/|$) index.html [L]
+RewriteRule ^login(/|$) index.html [L]
+RewriteRule ^signup(/|$) index.html [L]
+RewriteRule ^payment(/|$) index.html [L]
+RewriteRule ^business-planner(/|$) index.html [L]
+RewriteRule ^content-generator(/|$) index.html [L]
+RewriteRule ^upgrade-pro(/|$) index.html [L]
+RewriteRule ^sso-callback(/|$) index.html [L]
+
+# If the requested resource doesn't exist, use index.html
+RewriteRule ^ index.html [L]

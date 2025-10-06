@@ -1,1 +1,9 @@
+/admin/* /index.html 200
+/login /index.html 200
+/signup /index.html 200
+/payment /index.html 200
+/business-planner /index.html 200
+/content-generator /index.html 200
+/upgrade-pro /index.html 200
+/sso-callback /index.html 200
 /* /index.html 200

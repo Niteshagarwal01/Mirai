@@ -1,11 +1,7 @@
 {
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
+  "version": 2,
   "routes": [
+    { "handle": "filesystem" },
     { "src": "/admin", "dest": "/index.html" },
     { "src": "/admin/(.*)", "dest": "/index.html" },
     { "src": "/login", "dest": "/index.html" },
@@ -14,15 +10,16 @@
     { "src": "/business-planner", "dest": "/index.html" },
     { "src": "/content-generator", "dest": "/index.html" },
     { "src": "/upgrade-pro", "dest": "/index.html" },
-    { "src": "/sso-callback", "dest": "/index.html" }
+    { "src": "/sso-callback", "dest": "/index.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ],
-  "trailingSlash": false,
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "build": {
-    "env": {
-      "NODE_ENV": "production"
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "s-maxage=1, stale-while-revalidate" },
+        { "key": "X-Frame-Options", "value": "DENY" }
+      ]
     }
-  }
+  ]
 }
