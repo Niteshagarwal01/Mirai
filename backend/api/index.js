@@ -20,10 +20,13 @@ app.use(cors({
     'http://localhost:5173',
     'http://localhost:5174',
     'https://mirai-ejxu.vercel.app',
+    'https://mirai-mauve.vercel.app',
     'https://mirai-git-main-niteshagarwal01s-projects.vercel.app',
     process.env.FRONTEND_URL
   ].filter(Boolean),
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // JSON body parser

@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 import razorpay from './lib/stripe.js';
 import checkoutRouter from './routes/checkout.js';
 import webhooksRouter from './routes/webhooks.js';
@@ -23,11 +25,14 @@ app.use(cors({
     'http://127.0.0.1:5173',
     'http://127.0.0.1:5174',
     'https://mirai-ejxu.vercel.app',
+    'https://mirai-mauve.vercel.app',
     'https://mirai-git-main-niteshagarwal01s-projects.vercel.app',
     'https://mirai-backend.onrender.com',
     process.env.FRONTEND_URL
   ].filter(Boolean),
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // JSON body parser
@@ -118,10 +123,23 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Serve static files in production environment (for deployment on the same server)
+if (process.env.NODE_ENV === 'production' && process.env.SERVE_FRONTEND === 'true') {
+  const __dirname = dirname(fileURLToPath(import.meta.url));
+  const staticPath = join(__dirname, '../dist');
+  
+  app.use(express.static(staticPath));
+  
+  // For all requests that don't match an API route or static file, send the index.html
+  app.get('*', (req, res) => {
+    res.sendFile(join(staticPath, 'index.html'));
+  });
+}
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV}`);
-  console.log(`🔐 Auth: Clerk | 💳 Payment: Razorpay | 🗄️ Database: Supabase`);
+  console.log(`🔐 Auth: Clerk | 💳 Payment: Razorpay | 🗄️ Database: MongoDB`);
 });
 
 // Export for Vercel serverless
