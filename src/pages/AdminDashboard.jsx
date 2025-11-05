@@ -130,7 +130,8 @@ const AdminDashboard = () => {
         console.log('🔐 Fetching user plan with token:', token ? 'Token exists' : 'No token');
         console.log('👤 User email:', user?.primaryEmailAddress?.emailAddress);
         
-        const response = await fetch('http://localhost:3001/api/user/plan', {
+        const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+        const response = await fetch(`${API_BASE_URL}/api/user/plan`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
