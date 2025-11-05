@@ -7,9 +7,9 @@ import { fileURLToPath } from 'url';
 import razorpay from './lib/stripe.js';
 import checkoutRouter from './routes/checkout.js';
 import webhooksRouter from './routes/webhooks.js';
-import botsRouter from './routes/bots.js';
 import userRouter from './routes/user.js';
-import aiRouter from './routes/ai.js';
+import chatbotsRouter from './routes/chatbots.js';
+import voiceAgentsRouter from './routes/voiceAgents.js';
 
 dotenv.config();
 
@@ -107,13 +107,51 @@ app.get('/api/health/clerk', (req, res) => {
   }
 });
 
+// Chatbase health check
+app.get('/api/health/chatbase', (req, res) => {
+  const chatbaseKey = process.env.CHATBASE_API_KEY;
+  
+  if (chatbaseKey) {
+    res.json({ 
+      status: 'ok', 
+      message: 'Chatbase configured',
+      key: chatbaseKey.substring(0, 15) + '...'
+    });
+  } else {
+    res.status(500).json({ 
+      status: 'error', 
+      message: 'Chatbase API key missing',
+      hint: 'Add CHATBASE_API_KEY to .env'
+    });
+  }
+});
+
+// Vapi health check
+app.get('/api/health/vapi', (req, res) => {
+  const vapiKey = process.env.VAPI_API_KEY;
+  
+  if (vapiKey) {
+    res.json({ 
+      status: 'ok', 
+      message: 'Vapi configured',
+      key: vapiKey.substring(0, 15) + '...'
+    });
+  } else {
+    res.status(500).json({ 
+      status: 'error', 
+      message: 'Vapi API key missing',
+      hint: 'Add VAPI_API_KEY to .env'
+    });
+  }
+});
+
 // API Routes
 app.use('/api/checkout', checkoutRouter);
 app.use('/api/webhooks', webhooksRouter);
 app.use('/api/payment', webhooksRouter); // verify route
-app.use('/api/bots', botsRouter);
 app.use('/api/user', userRouter);
-app.use('/api/ai', aiRouter); // AI Content Generation routes
+app.use('/api/chatbots', chatbotsRouter);
+app.use('/api/voice-agents', voiceAgentsRouter);
 
 // Error handler
 app.use((err, req, res, next) => {
@@ -138,8 +176,11 @@ if (process.env.NODE_ENV === 'production' && process.env.SERVE_FRONTEND === 'tru
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV}`);
-  console.log(`🔐 Auth: Clerk | 💳 Payment: Razorpay | 🗄️ Database: MongoDB`);
+  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔐 Auth: Clerk (Authentication)`);
+  console.log(`💳 Payment: Razorpay (Payment Gateway)`);
+  console.log(`🗄️ Database: MongoDB Atlas`);
+  console.log(`\n✅ Backend is ready - Authentication & Payment services active`);
 });
 
 // Export for Vercel serverless

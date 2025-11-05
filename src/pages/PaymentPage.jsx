@@ -28,36 +28,48 @@ const PaymentPage = () => {
   const planDetails = {
     starter: {
       name: 'Starter',
-      price: 1577, // ₹1,577 (approx $19)
+      price: 1577, // ₹1,577/month (approx $19)
       features: [
-        'AI visual content (50 images/month)',
-        'Basic customer support automation',
-        'Content generation (10 pieces/month)',
-        'Essential analytics dashboard'
+        'AI Content Generator (50 pieces/day)',
+        'Business Planner (3 plans/day)',
+        'AI Photoshoot (20 images/day)',
+        'AI VideoShoot (5 videos/day)',
+        'Voice Agent (Basic features)',
+        'AI Chatbot (1 bot, 500 conversations/day)',
+        'Email Marketing (100 emails/day)',
+        'Content History'
       ]
     },
     professional: {
       name: 'Professional',
-      price: 3237, // ₹3,237 (approx $39)
+      price: 3237, // ₹3,237/month (approx $39)
       features: [
-        'AI visual content (200 images/month)',
-        'Advanced customer support automation',
-        'Content generation (50 pieces/month)',
-        'Enhanced analytics with reporting',
-        '3D model generation (10/month)'
+        'AI Content Generator (200 pieces/day)',
+        'Business Planner (15 plans/day)',
+        'AI Photoshoot (100 images/day)',
+        'AI VideoShoot (25 videos/day)',
+        'Voice Agent (Advanced + Analytics)',
+        'AI Chatbot (5 bots, 2,500 conversations/day)',
+        'Email Marketing (1,000 emails/day)',
+        'Content History & Analytics',
+        'API Access'
       ]
     },
     enterprise: {
       name: 'Enterprise',
-      price: 6557, // ₹6,557 (approx $79)
+      price: 6557, // ₹6,557/month (approx $79)
       features: [
-        'Unlimited AI visual content',
-        'Comprehensive customer support',
-        'Unlimited content generation',
-        'Advanced analytics with dashboards',
-        'Unlimited 3D model generation',
-        'Priority technical support',
-        'API access for custom integrations'
+        'Unlimited AI Content Generation',
+        'Unlimited Business Plans',
+        'Unlimited AI Photoshoot',
+        'Unlimited AI VideoShoot',
+        'Voice Agent (Full suite + Custom training)',
+        'AI Chatbot (Unlimited bots + conversations)',
+        'Unlimited Email Marketing',
+        'Advanced Analytics & Reporting',
+        'API Access & Custom Integrations',
+        'White-label Solutions',
+        'Priority Support'
       ]
     }
   };

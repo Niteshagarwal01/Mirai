@@ -5,15 +5,10 @@ import prisma from '../lib/prisma.js';
 
 const router = express.Router();
 
-/**
- * POST /api/webhooks/razorpay
- * Handles Razorpay webhook events (payment success)
- */
 router.post('/razorpay', express.json(), async (req, res) => {
   const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
   const signature = req.headers['x-razorpay-signature'];
 
-  // Verify webhook signature
   const expectedSignature = crypto
     .createHmac('sha256', webhookSecret)
     .update(JSON.stringify(req.body))
@@ -28,17 +23,14 @@ router.post('/razorpay', express.json(), async (req, res) => {
   const payload = req.body.payload;
 
   try {
-    // Handle payment captured event
     if (event === 'payment.captured') {
       const payment = payload.payment.entity;
       const orderId = payment.order_id;
 
-      // Get order details to retrieve user info
       const order = await razorpay.orders.fetch(orderId);
       const { clerkUserId, email } = order.notes;
 
       if (clerkUserId) {
-        // Upgrade user to Pro plan
         await prisma.user.upsert({
           where: { clerkUserId },
           update: { plan: 'pro' },
@@ -48,8 +40,6 @@ router.post('/razorpay', express.json(), async (req, res) => {
             plan: 'pro',
           },
         });
-
-        console.log(`✅ User ${clerkUserId} upgraded to Pro plan via Razorpay`);
       }
     }
 
@@ -60,10 +50,6 @@ router.post('/razorpay', express.json(), async (req, res) => {
   }
 });
 
-/**
- * POST /api/payment/verify
- * Verify Razorpay payment with signature
- */
 router.post('/verify', express.json(), async (req, res) => {
   try {
     const {
@@ -74,7 +60,6 @@ router.post('/verify', express.json(), async (req, res) => {
       email,
     } = req.body;
 
-    // Verify signature
     const body = razorpay_order_id + '|' + razorpay_payment_id;
     const expectedSignature = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
@@ -82,7 +67,6 @@ router.post('/verify', express.json(), async (req, res) => {
       .digest('hex');
 
     if (expectedSignature === razorpay_signature) {
-      // Payment is verified, upgrade user to Pro plan
       await prisma.user.upsert({
         where: { clerkUserId },
         update: { plan: 'pro' },
@@ -93,7 +77,6 @@ router.post('/verify', express.json(), async (req, res) => {
         },
       });
 
-      console.log(`✅ User ${clerkUserId} upgraded to Pro plan`);
       res.json({ success: true, message: 'Payment verified, upgraded to Pro!' });
     } else {
       res.status(400).json({ success: false, message: 'Invalid signature' });

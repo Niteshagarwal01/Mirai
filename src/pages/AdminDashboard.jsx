@@ -200,29 +200,36 @@ const AdminDashboard = () => {
               </Link>
             </li>
             
-            <li className="menu-item">
-              <Link to="#">
+            <li className={`menu-item ${location.pathname.includes('/admin/ai-videoshoot') ? 'active' : ''}`}>
+              <Link to="/admin/ai-videoshoot">
                 <i className="fas fa-video"></i>
                 <span>AI VideoShoot</span>
               </Link>
             </li>
             
-            <li className="menu-item">
-              <Link to="#">
+            <li className={`menu-item ${location.pathname.includes('/admin/ai-photoshoot') ? 'active' : ''}`}>
+              <Link to="/admin/ai-photoshoot">
                 <i className="fas fa-image"></i>
                 <span>AI Photoshoot</span>
               </Link>
             </li>
             
-            <li className="menu-item">
-              <Link to="#">
+            <li className={`menu-item ${location.pathname.includes('/admin/voice-agent') ? 'active' : ''}`}>
+              <Link to="/admin/voice-agent">
                 <i className="fas fa-comment-alt"></i>
                 <span>Voice Agent</span>
               </Link>
             </li>
             
-            <li className="menu-item">
-              <Link to="#">
+            <li className={`menu-item ${location.pathname.includes('/admin/chatbot') ? 'active' : ''}`}>
+              <Link to="/admin/chatbot">
+                <i className="fas fa-robot"></i>
+                <span>AI Chatbot</span>
+              </Link>
+            </li>
+            
+            <li className={`menu-item ${location.pathname.includes('/admin/email-marketing') ? 'active' : ''}`}>
+              <Link to="/admin/email-marketing">
                 <i className="fas fa-envelope"></i>
                 <span>Email Marketing</span>
               </Link>
@@ -235,8 +242,8 @@ const AdminDashboard = () => {
               </Link>
             </li>
             
-            <li className="menu-item">
-              <Link to="#">
+            <li className={`menu-item ${location.pathname.includes('/admin/settings') ? 'active' : ''}`}>
+              <Link to="/admin/settings">
                 <i className="fas fa-cog"></i>
                 <span>Settings</span>
               </Link>
@@ -263,8 +270,15 @@ const AdminDashboard = () => {
       
       {/* Main Content Area */}
       <div className="admin-main-content">
-        {/* Hide the Command Center header when on Content Generator or Business Planner routes */}
-        {!location.pathname.includes('/admin/content') && !location.pathname.includes('/admin/business-planner') && (
+        {/* Hide the Command Center header when on Content Generator, Business Planner, or other feature routes */}
+        {!location.pathname.includes('/admin/content') && 
+         !location.pathname.includes('/admin/business-planner') && 
+         !location.pathname.includes('/admin/email-marketing') && 
+         !location.pathname.includes('/admin/voice-agent') && 
+         !location.pathname.includes('/admin/chatbot') && 
+         !location.pathname.includes('/admin/ai-photoshoot') && 
+         !location.pathname.includes('/admin/ai-videoshoot') && 
+         !location.pathname.includes('/admin/settings') && (
           <div className="admin-header">
             <div className="header-title">
               <div className="title-icon">
@@ -391,19 +405,19 @@ const AdminDashboard = () => {
                   <h2 className="section-title">AI Tools</h2>
                     <div className="ai-tools-grid">
                     {/* Active Tools First */}
-                    <Link to="/admin/content" className="ai-tool-card active-tool">
+                    <Link to="/admin/content" className="ai-tool-card">
                       <div className="tool-icon content-tool">
-                        <i className="fas fa-file-alt"></i>
+                        <i className="fas fa-magic"></i>
                       </div>
                       <div className="tool-label">
-                        <div className="tool-tag">AI TOOL</div>
-                        <h3>Content Generator</h3>
-                        <p>Create blogs, social posts and marketing materials</p>
+                        <div className="tool-info">
+                          <h3>Content Generator</h3>
+                          <p>Create blogs, social posts and marketing materials</p>
+                        </div>
                       </div>
-                      <div className="tool-badge">Active</div>
                     </Link>
                     
-                    <Link to="/admin/business-planner" className="ai-tool-card active-tool">
+                    <Link to="/admin/business-planner" className="ai-tool-card">
                       <div className="tool-icon plan-tool">
                         <i className="fas fa-calendar-alt"></i>
                       </div>
@@ -412,53 +426,63 @@ const AdminDashboard = () => {
                         <h3>Business Planner</h3>
                         <p>Generate comprehensive business plans with AI</p>
                       </div>
-                      <div className="tool-badge">Active</div>
                     </Link>
                     
                     {/* Other Tools */}
-                    <div className="ai-tool-card">
+                    <Link to="/admin/email-marketing" className="ai-tool-card">
                       <div className="tool-icon email-tool">
                         <i className="fas fa-envelope"></i>
                       </div>
                       <div className="tool-label">
                         <div className="tool-tag">AI TOOL</div>
-                        <h3>Email Engine</h3>
+                        <h3>Email Marketing</h3>
                         <p>Smart email automation with AI-powered templates</p>
                       </div>
-                    </div>
+                    </Link>
                     
-                    <div className="ai-tool-card">
+                    <Link to="/admin/ai-photoshoot" className="ai-tool-card">
                       <div className="tool-icon image-tool">
                         <i className="fas fa-image"></i>
                       </div>
                       <div className="tool-label">
                         <div className="tool-tag">AI TOOL</div>
-                        <h3>AI Product Photoshoot</h3>
+                        <h3>AI Photoshoot</h3>
                         <p>Transform regular photos into professional marketing images</p>
                       </div>
-                    </div>
+                    </Link>
                     
-                    <div className="ai-tool-card">
+                    <Link to="/admin/voice-agent" className="ai-tool-card">
                       <div className="tool-icon voice-tool">
                         <i className="fas fa-microphone-alt"></i>
                       </div>
                       <div className="tool-label">
                         <div className="tool-tag">AI TOOL</div>
-                        <h3>Voice Sales Agent</h3>
+                        <h3>Voice Agent</h3>
                         <p>Configure AI phone agents to handle customer calls</p>
                       </div>
-                    </div>
+                    </Link>
                     
-                    <div className="ai-tool-card">
+                    <Link to="/admin/chatbot" className="ai-tool-card">
+                      <div className="tool-icon chatbot-tool">
+                        <i className="fas fa-robot"></i>
+                      </div>
+                      <div className="tool-label">
+                        <div className="tool-tag">AI TOOL</div>
+                        <h3>AI Chatbot</h3>
+                        <p>Create intelligent chatbots for customer support and engagement</p>
+                      </div>
+                    </Link>
+                    
+                    <Link to="/admin/ai-videoshoot" className="ai-tool-card">
                       <div className="tool-icon video-tool">
                         <i className="fas fa-video"></i>
                       </div>
                       <div className="tool-label">
                         <div className="tool-tag">AI TOOL</div>
-                        <h3>Video Generator</h3>
+                        <h3>AI VideoShoot</h3>
                         <p>Create professional video content with AI assistance</p>
                       </div>
-                    </div>
+                    </Link>
                   </div>
                 </div>
               </>

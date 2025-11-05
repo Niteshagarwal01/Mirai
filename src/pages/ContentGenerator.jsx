@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import aiService from '../services/aiService.js';
 import '../css/content-generator.css';
 
-// Import images directly - keeping your original design
+
 import instagramImg from '../assets/insta.jpeg';
 import linkedinImg from '../assets/LinkedIn-Logo-2-scaled.jpg';
 import twitterImg from '../assets/twitter.jpeg';
@@ -71,7 +70,7 @@ const ContentGenerator = () => {
       name: 'Email Campaign',
       description: 'Draft professional email marketing campaigns',
       image: blogpostImg,
-      icon: '✉️',
+      icon: 'Γ£ë∩╕Å',
       category: 'Marketing'
     },
     {
@@ -79,7 +78,7 @@ const ContentGenerator = () => {
       name: 'Product Description',
       description: 'Generate compelling product descriptions for e-commerce',
       image: blogpostImg,
-      icon: '🛍️',
+      icon: '≡ƒ¢ì∩╕Å',
       category: 'E-commerce'
     }
   ];
@@ -95,10 +94,13 @@ const ContentGenerator = () => {
 
   const loadProviders = async () => {
     try {
-      const response = await aiService.getAvailableProviders();
-      if (response.success) {
-        setProviders(response.providers);
-      }
+      // Mock providers data - backend not connected
+      const mockProviders = [
+        { id: 'auto', name: 'Auto (Best Available)', status: 'available' },
+        { id: 'groq', name: 'Groq', status: 'available' },
+        { id: 'gemini', name: 'Google Gemini', status: 'available' }
+      ];
+      setProviders(mockProviders);
     } catch (error) {
       console.error('Error loading providers:', error);
     }
@@ -164,19 +166,18 @@ const ContentGenerator = () => {
     try {
       const currentUser = getCurrentUser();
       const contentData = {
-        contentType: selectedType.name, // Use name instead of id to match backend
-        topic: formData.prompt.trim(), // Backend expects 'topic' not 'prompt'
+        contentType: selectedType.name,
+        topic: formData.prompt.trim(),
         tone: formData.tone,
-        provider: formData.provider === 'auto' ? 'groq' : formData.provider // Default to groq
+        provider: formData.provider === 'auto' ? 'groq' : formData.provider
       };
 
-      const response = await aiService.generateContent(contentData);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      if (response.success && response.content) {
-        setResult(response.content);
-      } else {
-        setError(response.error || 'Failed to generate content');
-      }
+      // Don't show output - just show success message
+      alert('🚧 Feature Under Development!\n\nYour content request has been recorded. This feature will be available soon!');
+      
     } catch (error) {
       console.error('Content generation error:', error);
       setError('An error occurred while generating content. Please try again.');
@@ -397,6 +398,58 @@ const ContentGenerator = () => {
             </button>
           </div>
         )}
+
+        {/* Content History Section */}
+        <div className="content-history-section">
+          <h2>Content History</h2>
+          <div className="history-notice">
+            <i className="fas fa-info-circle"></i>
+            <p>Your generated content history will appear here once the backend is connected.</p>
+          </div>
+          
+          {/* Mock history items for UI demonstration */}
+          <div className="history-items">
+            <div className="history-item">
+              <div className="history-header">
+                <span className="content-type">Instagram Post</span>
+                <span className="created-date">2 days ago</span>
+              </div>
+              <div className="history-preview">
+                "Summer collection launch post with engaging captions..."
+              </div>
+              <div className="history-actions">
+                <button className="history-btn"><i className="fas fa-eye"></i></button>
+                <button className="history-btn"><i className="fas fa-copy"></i></button>
+              </div>
+            </div>
+            <div className="history-item">
+              <div className="history-header">
+                <span className="content-type">LinkedIn Post</span>
+                <span className="created-date">1 week ago</span>
+              </div>
+              <div className="history-preview">
+                "Professional networking post about industry trends..."
+              </div>
+              <div className="history-actions">
+                <button className="history-btn"><i className="fas fa-eye"></i></button>
+                <button className="history-btn"><i className="fas fa-copy"></i></button>
+              </div>
+            </div>
+            <div className="history-item">
+              <div className="history-header">
+                <span className="content-type">Blog Post</span>
+                <span className="created-date">2 weeks ago</span>
+              </div>
+              <div className="history-preview">
+                "Comprehensive guide to digital marketing strategies..."
+              </div>
+              <div className="history-actions">
+                <button className="history-btn"><i className="fas fa-eye"></i></button>
+                <button className="history-btn"><i className="fas fa-copy"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -10,6 +10,12 @@ import ContentGenerator from './pages/ContentGenerator.jsx'
 import UpgradeToPro from './pages/UpgradeToPro.jsx'
 import PaymentPage from './pages/PaymentPage.jsx'
 import BusinessPlanner from './pages/BusinessPlanner.jsx'
+import EmailMarketing from './pages/EmailMarketing.jsx'
+import VoiceAgent from './pages/VoiceAgent.jsx'
+import Chatbot from './pages/Chatbot.jsx'
+import AIPhotoshoot from './pages/AIPhotoshoot.jsx'
+import AIVideoShoot from './pages/AIVideoShoot.jsx'
+import Settings from './pages/Settings.jsx'
 import { NotFound } from './ErrorBoundary.jsx'
 import './css/App.css'
 import './css/custom-login-fix.css'
@@ -144,6 +150,12 @@ function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="content" element={<ContentGenerator />} />
             <Route path="business-planner" element={<BusinessPlanner />} />
+            <Route path="email-marketing" element={<EmailMarketing />} />
+            <Route path="voice-agent" element={<VoiceAgent />} />
+            <Route path="chatbot" element={<Chatbot />} />
+            <Route path="ai-photoshoot" element={<AIPhotoshoot />} />
+            <Route path="ai-videoshoot" element={<AIVideoShoot />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
           
           {/* Backward compatibility */}

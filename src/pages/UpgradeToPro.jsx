@@ -44,10 +44,14 @@ const UpgradeToPro = () => {
               <div className="pricing-features">
                 <p className="package-description">For new startups just beginning their journey</p>
                 <ul>
-                  <li><i className="fas fa-check"></i> AI visual content (50 images/month)</li>
-                  <li><i className="fas fa-check"></i> Basic customer support automation</li>
-                  <li><i className="fas fa-check"></i> Content generation (10 pieces/month)</li>
-                  <li><i className="fas fa-check"></i> Essential analytics dashboard</li>
+                  <li><i className="fas fa-check"></i> Content Generation (50 pieces/day)</li>
+                  <li><i className="fas fa-check"></i> Business Plans (3 plans/day)</li>
+                  <li><i className="fas fa-check"></i> AI Photoshoot (20 images/day)</li>
+                  <li><i className="fas fa-check"></i> AI VideoShoot (5 videos/day)</li>
+                  <li><i className="fas fa-check"></i> Voice Agent (Basic features)</li>
+                  <li><i className="fas fa-check"></i> AI Chatbot (1 bot, 500 conversations/day)</li>
+                  <li><i className="fas fa-check"></i> Email Marketing (100 emails/day)</li>
+                  <li><i className="fas fa-check"></i> Content History</li>
                 </ul>
               </div>
               <button onClick={() => handleUpgradeClick('starter')} className="btn-primary">
@@ -64,11 +68,15 @@ const UpgradeToPro = () => {
               <div className="pricing-features">
                 <p className="package-description">For growing startups with established needs</p>
                 <ul>
-                  <li><i className="fas fa-check"></i> AI visual content (200 images/month)</li>
-                  <li><i className="fas fa-check"></i> Advanced customer support automation</li>
-                  <li><i className="fas fa-check"></i> Content generation (50 pieces/month)</li>
-                  <li><i className="fas fa-check"></i> Enhanced analytics with reporting</li>
-                  <li><i className="fas fa-check"></i> 3D model generation (10/month)</li>
+                  <li><i className="fas fa-check"></i> Content Generation (200 pieces/day)</li>
+                  <li><i className="fas fa-check"></i> Business Plans (15 plans/day)</li>
+                  <li><i className="fas fa-check"></i> AI Photoshoot (100 images/day)</li>
+                  <li><i className="fas fa-check"></i> AI VideoShoot (25 videos/day)</li>
+                  <li><i className="fas fa-check"></i> Voice Agent (Advanced features)</li>
+                  <li><i className="fas fa-check"></i> AI Chatbot (5 bots, 2,500 conversations/day)</li>
+                  <li><i className="fas fa-check"></i> Email Marketing (1,000 emails/day)</li>
+                  <li><i className="fas fa-check"></i> Content History</li>
+                  <li><i className="fas fa-check"></i> API Access</li>
                 </ul>
               </div>
               <button onClick={() => handleUpgradeClick('professional')} className="btn-primary">
@@ -84,13 +92,17 @@ const UpgradeToPro = () => {
               <div className="pricing-features">
                 <p className="package-description">For scaling startups with complex needs</p>
                 <ul>
-                  <li><i className="fas fa-check"></i> Unlimited AI visual content</li>
-                  <li><i className="fas fa-check"></i> Comprehensive customer support</li>
-                  <li><i className="fas fa-check"></i> Unlimited content generation</li>
-                  <li><i className="fas fa-check"></i> Advanced analytics with dashboards</li>
-                  <li><i className="fas fa-check"></i> Unlimited 3D model generation</li>
-                  <li><i className="fas fa-check"></i> Priority technical support</li>
-                  <li><i className="fas fa-check"></i> API access for custom integrations</li>
+                  <li><i className="fas fa-check"></i> Content Generation (Unlimited)</li>
+                  <li><i className="fas fa-check"></i> Business Plans (Unlimited)</li>
+                  <li><i className="fas fa-check"></i> AI Photoshoot (Unlimited)</li>
+                  <li><i className="fas fa-check"></i> AI VideoShoot (Unlimited)</li>
+                  <li><i className="fas fa-check"></i> Voice Agent (Full suite)</li>
+                  <li><i className="fas fa-check"></i> AI Chatbot (Unlimited bots + conversations)</li>
+                  <li><i className="fas fa-check"></i> Email Marketing (Unlimited)</li>
+                  <li><i className="fas fa-check"></i> Content History</li>
+                  <li><i className="fas fa-check"></i> API Access</li>
+                  <li><i className="fas fa-check"></i> White-label Solution</li>
+                  <li><i className="fas fa-check"></i> Priority Support</li>
                 </ul>
               </div>
               <button onClick={() => handleUpgradeClick('enterprise')} className="btn-primary">

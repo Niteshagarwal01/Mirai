@@ -903,6 +903,11 @@
   color: #ffbe3d;
 }
 
+.chatbot-tool {
+  background: rgba(110, 64, 255, 0.1);
+  color: var(--primary);
+}
+
 .content-tool {
   background: rgba(110, 64, 255, 0.1);
   color: var(--accent-color);

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import aiService from '../services/aiService';
 import '../css/business-planner.css';
 
 const BusinessPlanner = () => {
@@ -128,7 +127,7 @@ const BusinessPlanner = () => {
         return;
       }
       
-      // Use AI service to generate business plan
+      // Use mock data - AI service backend not connected
       const planData = {
         businessName: formData.businessName.trim(),
         businessDescription: formData.businessDescription.trim(),
@@ -138,25 +137,13 @@ const BusinessPlanner = () => {
         tone: 'professional'
       };
       
-      const response = await aiService.generateBusinessPlan(planData);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 3000));
       
-      if (response.success && response.content) {
-        // Create a business plan structure from AI response
-        const generatedPlan = {
-          id: Date.now().toString(),
-          name: formData.businessName || 'Unnamed Business Plan',
-          createdAt: new Date().toISOString(),
-          content: response.content,
-          provider: response.provider,
-          status: 'completed'
-        };
-        
-        setGeneratedPlan(generatedPlan);
-        setPlans([...plans, generatedPlan]);
-        setShowCreatePlan(false);
-      } else {
-        alert(response.error || 'Failed to generate business plan. Please try again.');
-      }
+      // Don't show business plan - just show success message  
+      alert('🚧 Business Plan Generation Under Development!\n\nYour business details have been recorded. This feature will be available soon!');
+      
+      setShowCreatePlan(false);
       
     } catch (error) {
       console.error('Error generating business plan:', error);
@@ -173,7 +160,7 @@ const BusinessPlanner = () => {
   const renderPlanList = () => {
     return (
       <div className="plan-list-empty">
-        <div className="empty-icon">📄</div>
+        <div className="empty-icon">≡ƒôä</div>
         <h3>No business plans yet</h3>
         <p>Create your first business plan to get started</p>
         <button className="create-plan-btn" onClick={handleStartPlan}>

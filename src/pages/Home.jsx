@@ -88,54 +88,20 @@ const Home = () => {
                 <p>Transform your digital marketing experience with our powerful suite of features</p>
             </div>
             <div className="feature-grid">
-                <a href="pages/features/ai-product-photoshoot.html" className="feature-item" onClick={handleFeatureClick}>
-                    <div className="feature-icon">
-                        <i className="fas fa-camera-retro"></i>
-                    </div>
-                    <div className="feature-content">
-                        <h3>AI Product Photoshoot</h3>
-                        <p>Transform basic product photos into professional marketing images with our AI image generation technology.</p>
-                    </div>
-                    <div className="feature-arrow">
-                        <i className="fas fa-arrow-right"></i>
-                    </div>
-                </a>
-                <a href="pages/features/marketing-chat-assistant.html" className="feature-item" onClick={handleFeatureClick}>
-                    <div className="feature-icon">
-                        <i className="fas fa-comment-dots"></i>
-                    </div>
-                    <div className="feature-content">
-                        <h3>Marketing Chat Assistant</h3>
-                        <p>Get instant marketing advice and content suggestions from our AI assistant that knows your brand.</p>
-                    </div>
-                    <div className="feature-arrow">
-                        <i className="fas fa-arrow-right"></i>
-                    </div>
-                </a>
-                <a href="pages/features/voice-sales-agent.html" className="feature-item" onClick={handleFeatureClick}>
-                    <div className="feature-icon">
-                        <i className="fas fa-phone-alt"></i>
-                    </div>
-                    <div className="feature-content">
-                        <h3>Voice Sales Agent</h3>
-                        <p>Deploy AI voice agents that can handle customer calls and qualify leads 24/7.</p>
-                    </div>
-                    <div className="feature-arrow">
-                        <i className="fas fa-arrow-right"></i>
-                    </div>
-                </a>
-                <a href="pages/features/content-generation.html" className="feature-item" onClick={handleFeatureClick}>
+                <Link to="/admin/content" className="feature-item">
                     <div className="feature-icon">
                         <i className="fas fa-file-alt"></i>
                     </div>
                     <div className="feature-content">
-                        <h3>Content Generation</h3>
+                        <h3>AI Content Generator</h3>
                         <p>Create blogs, social media posts, and articles tailored to your brand voice in seconds.</p>
                     </div>
                     <div className="feature-arrow">
                         <i className="fas fa-arrow-right"></i>
                     </div>
-                </a>                <Link to="/business-planner" className="feature-item">
+                </Link>
+                
+                <Link to="/admin/business-planner" className="feature-item">
                     <div className="feature-icon">
                         <i className="fas fa-chart-line"></i>
                     </div>
@@ -147,7 +113,60 @@ const Home = () => {
                         <i className="fas fa-arrow-right"></i>
                     </div>
                 </Link>
-                <a href="pages/features/email-marketing-engine.html" className="feature-item" onClick={handleFeatureClick}>
+                
+                <Link to="/admin/ai-photoshoot" className="feature-item">
+                    <div className="feature-icon">
+                        <i className="fas fa-camera-retro"></i>
+                    </div>
+                    <div className="feature-content">
+                        <h3>AI Product Photoshoot</h3>
+                        <p>Transform basic product photos into professional marketing images with our AI image generation technology.</p>
+                    </div>
+                    <div className="feature-arrow">
+                        <i className="fas fa-arrow-right"></i>
+                    </div>
+                </Link>
+                
+                <Link to="/admin/ai-videoshoot" className="feature-item">
+                    <div className="feature-icon">
+                        <i className="fas fa-video"></i>
+                    </div>
+                    <div className="feature-content">
+                        <h3>AI Video Shoot</h3>
+                        <p>Create professional marketing videos with AI-powered video generation and editing tools.</p>
+                    </div>
+                    <div className="feature-arrow">
+                        <i className="fas fa-arrow-right"></i>
+                    </div>
+                </Link>
+                
+                <Link to="/admin/voice-agent" className="feature-item">
+                    <div className="feature-icon">
+                        <i className="fas fa-phone-alt"></i>
+                    </div>
+                    <div className="feature-content">
+                        <h3>Voice Sales Agent</h3>
+                        <p>Deploy AI voice agents that can handle customer calls and qualify leads 24/7.</p>
+                    </div>
+                    <div className="feature-arrow">
+                        <i className="fas fa-arrow-right"></i>
+                    </div>
+                </Link>
+                
+                <Link to="/admin/chatbot" className="feature-item">
+                    <div className="feature-icon">
+                        <i className="fas fa-robot"></i>
+                    </div>
+                    <div className="feature-content">
+                        <h3>AI Chatbot</h3>
+                        <p>Create intelligent chatbots for customer support and engagement powered by Chatbase technology.</p>
+                    </div>
+                    <div className="feature-arrow">
+                        <i className="fas fa-arrow-right"></i>
+                    </div>
+                </Link>
+                
+                <Link to="/admin/email-marketing" className="feature-item">
                     <div className="feature-icon">
                         <i className="fas fa-envelope"></i>
                     </div>
@@ -158,19 +177,8 @@ const Home = () => {
                     <div className="feature-arrow">
                         <i className="fas fa-arrow-right"></i>
                     </div>
-                </a>
-                <a href="pages/features/competitor-analysis.html" className="feature-item" onClick={handleFeatureClick}>
-                    <div className="feature-icon">
-                        <i className="fas fa-chart-bar"></i>
-                    </div>
-                    <div className="feature-content">
-                        <h3>Competitor Analysis</h3>
-                        <p>Track your competitors and identify market opportunities with automated market intelligence.</p>
-                    </div>
-                    <div className="feature-arrow">
-                        <i className="fas fa-arrow-right"></i>
-                    </div>
-                </a>            </div>
+                </Link>
+            </div>
         </div>
     </section>
 
@@ -187,12 +195,15 @@ const Home = () => {
                         <div className="price">₹1,577<span>/month</span></div>
                     </div>
                     <div className="pricing-features">
-                        <p className="package-description">For new startups just beginning their journey</p>
+                        <p className="package-description">Perfect for individuals and small startups</p>
                         <ul>
-                            <li><i className="fas fa-check"></i> AI visual content (50 images/month)</li>
-                            <li><i className="fas fa-check"></i> Basic customer support automation</li>
-                            <li><i className="fas fa-check"></i> Content generation (10 pieces/month)</li>
-                            <li><i className="fas fa-check"></i> Essential analytics dashboard</li>
+                            <li><i className="fas fa-check"></i> AI Content Generator (50 pieces/day)</li>
+                            <li><i className="fas fa-check"></i> Business Planner (3 plans/day)</li>
+                            <li><i className="fas fa-check"></i> AI Photoshoot (20 images/day)</li>
+                            <li><i className="fas fa-check"></i> AI VideoShoot (5 videos/day)</li>
+                            <li><i className="fas fa-check"></i> Voice Agent (Basic)</li>
+                            <li><i className="fas fa-check"></i> AI Chatbot (1 bot, 500 conversations/day)</li>
+                            <li><i className="fas fa-check"></i> Email Marketing (100 emails/day)</li>
                         </ul>
                     </div>
                 </div>
@@ -203,13 +214,16 @@ const Home = () => {
                         <div className="price">₹3,237<span>/month</span></div>
                     </div>
                     <div className="pricing-features">
-                        <p className="package-description">For growing startups with established needs</p>
+                        <p className="package-description">For growing businesses and marketing teams</p>
                         <ul>
-                            <li><i className="fas fa-check"></i> AI visual content (200 images/month)</li>
-                            <li><i className="fas fa-check"></i> Advanced customer support automation</li>
-                            <li><i className="fas fa-check"></i> Content generation (50 pieces/month)</li>
-                            <li><i className="fas fa-check"></i> Enhanced analytics with reporting</li>
-                            <li><i className="fas fa-check"></i> 3D model generation (10/month)</li>
+                            <li><i className="fas fa-check"></i> AI Content Generator (200 pieces/day)</li>
+                            <li><i className="fas fa-check"></i> Business Planner (15 plans/day)</li>
+                            <li><i className="fas fa-check"></i> AI Photoshoot (100 images/day)</li>
+                            <li><i className="fas fa-check"></i> AI VideoShoot (25 videos/day)</li>
+                            <li><i className="fas fa-check"></i> Voice Agent (Advanced + Analytics)</li>
+                            <li><i className="fas fa-check"></i> AI Chatbot (5 bots, 2,500 conversations/day)</li>
+                            <li><i className="fas fa-check"></i> Email Marketing (1,000 emails/day)</li>
+                            <li><i className="fas fa-check"></i> Content History & Analytics</li>
                         </ul>                    </div>
                 </div>
                 <div className="pricing-card">
@@ -218,22 +232,25 @@ const Home = () => {
                         <div className="price">₹6,557<span>/month</span></div>
                     </div>
                     <div className="pricing-features">
-                        <p className="package-description">For scaling startups with complex needs</p>
+                        <p className="package-description">For large organizations and agencies</p>
                         <ul>
-                            <li><i className="fas fa-check"></i> Unlimited AI visual content</li>
-                            <li><i className="fas fa-check"></i> Comprehensive customer support</li>
-                            <li><i className="fas fa-check"></i> Unlimited content generation</li>
-                            <li><i className="fas fa-check"></i> Advanced analytics with dashboards</li>
-                            <li><i className="fas fa-check"></i> Unlimited 3D model generation</li>
-                            <li><i className="fas fa-check"></i> Priority technical support</li>
-                            <li><i className="fas fa-check"></i> API access for custom integrations</li>
+                            <li><i className="fas fa-check"></i> Unlimited AI Content Generation</li>
+                            <li><i className="fas fa-check"></i> Unlimited Business Plans</li>
+                            <li><i className="fas fa-check"></i> Unlimited AI Photoshoot</li>
+                            <li><i className="fas fa-check"></i> Unlimited AI VideoShoot</li>
+                            <li><i className="fas fa-check"></i> Voice Agent (Full suite + Custom training)</li>
+                            <li><i className="fas fa-check"></i> AI Chatbot (Unlimited bots + conversations)</li>
+                            <li><i className="fas fa-check"></i> Unlimited Email Marketing</li>
+                            <li><i className="fas fa-check"></i> Advanced Analytics & Reporting</li>
+                            <li><i className="fas fa-check"></i> API Access & Custom Integrations</li>
+                            <li><i className="fas fa-check"></i> White-label solutions</li>
                         </ul>                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    {/* <!-- Compare Plans Section --> */}
+    {/* Compare Plans Section */}
     <section className="compare-plans">
         <div className="container">
             <div className="section-header">
@@ -252,28 +269,52 @@ const Home = () => {
                     </thead>
                     <tbody>
                         <tr>
-                            <td>AI Image Generation</td>
-                            <td>50/month</td>
-                            <td>200/month</td>
+                            <td>AI Content Generation</td>
+                            <td>50 pieces/day</td>
+                            <td>200 pieces/day</td>
                             <td>Unlimited</td>
                         </tr>
                         <tr>
-                            <td>Content Generation</td>
-                            <td>10/month</td>
-                            <td>50/month</td>
+                            <td>Business Plan Generation</td>
+                            <td>3 plans/day</td>
+                            <td>15 plans/day</td>
                             <td>Unlimited</td>
                         </tr>
                         <tr>
-                            <td>Analytics</td>
-                            <td>Basic</td>
-                            <td>Enhanced</td>
-                            <td>Advanced</td>
+                            <td>AI Photoshoot</td>
+                            <td>20 images/day</td>
+                            <td>100 images/day</td>
+                            <td>Unlimited</td>
                         </tr>
                         <tr>
-                            <td>3D Model Generation</td>
+                            <td>AI VideoShoot</td>
+                            <td>5 videos/day</td>
+                            <td>25 videos/day</td>
+                            <td>Unlimited</td>
+                        </tr>
+                        <tr>
+                            <td>Voice Agent</td>
+                            <td>Basic features</td>
+                            <td>Advanced + Analytics</td>
+                            <td>Full suite + Custom training</td>
+                        </tr>
+                        <tr>
+                            <td>AI Chatbot</td>
+                            <td>1 bot, 500 conversations/day</td>
+                            <td>5 bots, 2,500 conversations/day</td>
+                            <td>Unlimited bots + conversations</td>
+                        </tr>
+                        <tr>
+                            <td>Email Marketing</td>
+                            <td>100 emails/day</td>
+                            <td>1,000 emails/day</td>
+                            <td>Unlimited</td>
+                        </tr>
+                        <tr>
+                            <td>Content History</td>
                             <td><i className="fas fa-times"></i></td>
-                            <td>10/month</td>
-                            <td>Unlimited</td>
+                            <td><i className="fas fa-check"></i></td>
+                            <td><i className="fas fa-check"></i></td>
                         </tr>
                         <tr>
                             <td>API Access</td>
@@ -282,13 +323,7 @@ const Home = () => {
                             <td><i className="fas fa-check"></i></td>
                         </tr>
                         <tr>
-                            <td>Priority Support</td>
-                            <td><i className="fas fa-times"></i></td>
-                            <td><i className="fas fa-times"></i></td>
-                            <td><i className="fas fa-check"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Custom Integrations</td>
+                            <td>White-label Solutions</td>
                             <td><i className="fas fa-times"></i></td>
                             <td><i className="fas fa-times"></i></td>
                             <td><i className="fas fa-check"></i></td>
@@ -299,12 +334,13 @@ const Home = () => {
         </div>
     </section>
 
-    {/* <!-- Call to Action --> */}
+    {/* Call to Action */}
     <section className="cta">
         <div className="container">
             <div className="cta-content">
                 <h2>Ready to Transform Your Marketing?</h2>
-                <p>Start your 14-day free trial today. No credit card required.</p>                <div className="cta-buttons">
+                <p>Start your 14-day free trial today. No credit card required.</p>
+                <div className="cta-buttons">
                     <Link to="/signup" className="btn-primary">Get Started Free</Link>
                     <Link to="/upgrade-pro" className="btn-secondary">Upgrade to Pro</Link>
                 </div>
@@ -312,7 +348,7 @@ const Home = () => {
         </div>
     </section>   
     
-     {/* <!-- Testimonials Section --> */}
+     {/* Testimonials Section */}
     <section id="testimonials" className="testimonials">
         <div className="container">
             <div className="section-header">
@@ -379,7 +415,7 @@ const Home = () => {
         <div className="blur-gradient right"></div>
     </section>   
     
-     {/* <!-- Demo Section -->     */}
+     {/* Demo Section */}
         <section id="demo" className="demo">
         <div className="container">
             <div className="demo-tag">See it in action</div>
@@ -441,7 +477,7 @@ const Home = () => {
         <div className="blur-gradient right"></div>
     </section>
 
-    {/* <!-- FAQ Section --> */}
+    {/* FAQ Section */}
     <section id="faq" className="faq">
         <div className="container">
             <div className="section-header">
