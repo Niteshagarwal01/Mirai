@@ -1,5 +1,15 @@
 {
   "version": 2,
+  "name": "mirai-app",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
   "routes": [
     { "handle": "filesystem" },
     { "src": "/admin", "dest": "/index.html" },
@@ -10,6 +20,12 @@
     { "src": "/business-planner", "dest": "/index.html" },
     { "src": "/content-generator", "dest": "/index.html" },
     { "src": "/upgrade-pro", "dest": "/index.html" },
+    { "src": "/chatbot", "dest": "/index.html" },
+    { "src": "/voice-agent", "dest": "/index.html" },
+    { "src": "/ai-photoshoot", "dest": "/index.html" },
+    { "src": "/ai-video-shoot", "dest": "/index.html" },
+    { "src": "/email-marketing", "dest": "/index.html" },
+    { "src": "/settings", "dest": "/index.html" },
     { "src": "/sso-callback", "dest": "/index.html" },
     { "src": "/(.*)", "dest": "/index.html" }
   ],
@@ -18,7 +34,9 @@
       "source": "/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "s-maxage=1, stale-while-revalidate" },
-        { "key": "X-Frame-Options", "value": "DENY" }
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     }
   ]
