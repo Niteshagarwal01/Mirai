@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useUser, useAuth } from '@clerk/clerk-react';
 import '../css/payment-page.css';
 import DebugEnv from '../components/DebugEnv';
+import { API_BASE_URL } from '../config/production';
 
 // Load Razorpay script
 const loadRazorpayScript = () => {
@@ -125,12 +126,11 @@ const PaymentPage = () => {
       console.log('Got Clerk token');
 
       // Create order from backend
-      const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
-      console.log('🔧 ENVIRONMENT VARIABLES:');
+      const API_URL = API_BASE_URL;
+      console.log('🔧 PRODUCTION CONFIG:');
+      console.log('  - FORCED API_URL:', API_URL);
       console.log('  - VITE_BACKEND_URL:', import.meta.env.VITE_BACKEND_URL);
-      console.log('  - Final API_URL:', API_URL);
-      console.log('  - MODE:', import.meta.env.MODE);
-      console.log('  - All env vars:', import.meta.env);
+      console.log('  - Current hostname:', window.location.hostname);
       console.log('Calling backend API:', `${API_URL}/api/checkout`);
       console.log('Using token:', token ? 'Token available' : 'NO TOKEN!');
       console.log('Email:', email);

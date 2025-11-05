@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, Outlet, useLocation } from 'react-router-dom';
 import { useUser, useClerk, useAuth } from '@clerk/clerk-react';
 import '../css/admin-dashboard.css';
+import { API_BASE_URL } from '../config/production';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -130,7 +131,6 @@ const AdminDashboard = () => {
         console.log('🔐 Fetching user plan with token:', token ? 'Token exists' : 'No token');
         console.log('👤 User email:', user?.primaryEmailAddress?.emailAddress);
         
-        const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
         const response = await fetch(`${API_BASE_URL}/api/user/plan`, {
           headers: {
             'Authorization': `Bearer ${token}`,

@@ -1,9 +1,11 @@
 /**
  * API Service for Backend Communication
- * Base URL: http://localhost:3001
+ * Base URL: Production backend
  */
 
-const API_BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+import { API_BASE_URL } from '../config/production';
+
+const API_BASE_URL_SERVICE = API_BASE_URL;
 
 /**
  * Helper function to get Clerk auth token
@@ -23,7 +25,7 @@ export const userAPI = {
    * @param {string} token - Clerk auth token
    */
   async getProfile(token) {
-    const response = await fetch(`${API_BASE_URL}/api/user/me`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/user/me`, {
       headers: getAuthHeaders(token)
     });
     
@@ -39,7 +41,7 @@ export const userAPI = {
    * @param {string} token - Clerk auth token
    */
   async getPlan(token) {
-    const response = await fetch(`${API_BASE_URL}/api/user/plan`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/user/plan`, {
       headers: getAuthHeaders(token)
     });
     
@@ -62,7 +64,7 @@ export const botAPI = {
    * @param {object} config - Bot configuration
    */
   async create(token, name, config) {
-    const response = await fetch(`${API_BASE_URL}/api/bots/create`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/bots/create`, {
       method: 'POST',
       headers: getAuthHeaders(token),
       body: JSON.stringify({ name, config })
@@ -87,7 +89,7 @@ export const botAPI = {
    * @param {string} token - Clerk auth token
    */
   async getAll(token) {
-    const response = await fetch(`${API_BASE_URL}/api/bots`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/bots`, {
       headers: getAuthHeaders(token)
     });
     
@@ -104,7 +106,7 @@ export const botAPI = {
    * @param {number} botId - Bot ID to delete
    */
   async delete(token, botId) {
-    const response = await fetch(`${API_BASE_URL}/api/bots/${botId}`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/bots/${botId}`, {
       method: 'DELETE',
       headers: getAuthHeaders(token)
     });
@@ -128,7 +130,7 @@ export const chatbotAPI = {
    * @param {object} chatbotData - Chatbot configuration
    */
   async create(token, chatbotData) {
-    const response = await fetch(`${API_BASE_URL}/api/chatbots/create`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/chatbots/create`, {
       method: 'POST',
       headers: getAuthHeaders(token),
       body: JSON.stringify(chatbotData)
@@ -148,7 +150,7 @@ export const chatbotAPI = {
    * @param {string} token - Clerk auth token
    */
   async getAll(token) {
-    const response = await fetch(`${API_BASE_URL}/api/chatbots`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/chatbots`, {
       headers: getAuthHeaders(token)
     });
     
@@ -165,7 +167,7 @@ export const chatbotAPI = {
    * @param {string} chatbotId - Chatbot ID
    */
   async get(token, chatbotId) {
-    const response = await fetch(`${API_BASE_URL}/api/chatbots/${chatbotId}`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/chatbots/${chatbotId}`, {
       headers: getAuthHeaders(token)
     });
     
@@ -183,7 +185,7 @@ export const chatbotAPI = {
    * @param {object} updates - Update data
    */
   async update(token, chatbotId, updates) {
-    const response = await fetch(`${API_BASE_URL}/api/chatbots/${chatbotId}`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/chatbots/${chatbotId}`, {
       method: 'PUT',
       headers: getAuthHeaders(token),
       body: JSON.stringify(updates)
@@ -204,7 +206,7 @@ export const chatbotAPI = {
    * @param {string} chatbotId - Chatbot ID
    */
   async delete(token, chatbotId) {
-    const response = await fetch(`${API_BASE_URL}/api/chatbots/${chatbotId}`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/chatbots/${chatbotId}`, {
       method: 'DELETE',
       headers: getAuthHeaders(token)
     });
@@ -230,7 +232,7 @@ export const chatbotAPI = {
       formData.append('files', file);
     });
 
-    const response = await fetch(`${API_BASE_URL}/api/chatbots/${chatbotId}/knowledge-base`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/chatbots/${chatbotId}/knowledge-base`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -261,7 +263,7 @@ export const chatbotAPI = {
       endDate
     });
 
-    const response = await fetch(`${API_BASE_URL}/api/chatbots/${chatbotId}/analytics?${params}`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/chatbots/${chatbotId}/analytics?${params}`, {
       headers: getAuthHeaders(token)
     });
     
@@ -280,7 +282,7 @@ export const chatbotAPI = {
    * @param {string} sessionId - Optional session ID
    */
   async test(token, chatbotId, message, sessionId = null) {
-    const response = await fetch(`${API_BASE_URL}/api/chatbots/${chatbotId}/test`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/chatbots/${chatbotId}/test`, {
       method: 'POST',
       headers: getAuthHeaders(token),
       body: JSON.stringify({ message, sessionId })
@@ -306,7 +308,7 @@ export const voiceAgentAPI = {
    * @param {object} assistantData - Voice assistant configuration
    */
   async create(token, assistantData) {
-    const response = await fetch(`${API_BASE_URL}/api/voice-agents/create`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/voice-agents/create`, {
       method: 'POST',
       headers: getAuthHeaders(token),
       body: JSON.stringify(assistantData)
@@ -326,7 +328,7 @@ export const voiceAgentAPI = {
    * @param {string} token - Clerk auth token
    */
   async getAll(token) {
-    const response = await fetch(`${API_BASE_URL}/api/voice-agents`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/voice-agents`, {
       headers: getAuthHeaders(token)
     });
     
@@ -343,7 +345,7 @@ export const voiceAgentAPI = {
    * @param {string} assistantId - Assistant ID
    */
   async get(token, assistantId) {
-    const response = await fetch(`${API_BASE_URL}/api/voice-agents/${assistantId}`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/voice-agents/${assistantId}`, {
       headers: getAuthHeaders(token)
     });
     
@@ -361,7 +363,7 @@ export const voiceAgentAPI = {
    * @param {object} updates - Update data
    */
   async update(token, assistantId, updates) {
-    const response = await fetch(`${API_BASE_URL}/api/voice-agents/${assistantId}`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/voice-agents/${assistantId}`, {
       method: 'PUT',
       headers: getAuthHeaders(token),
       body: JSON.stringify(updates)
@@ -382,7 +384,7 @@ export const voiceAgentAPI = {
    * @param {string} assistantId - Assistant ID
    */
   async delete(token, assistantId) {
-    const response = await fetch(`${API_BASE_URL}/api/voice-agents/${assistantId}`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/voice-agents/${assistantId}`, {
       method: 'DELETE',
       headers: getAuthHeaders(token)
     });
@@ -404,7 +406,7 @@ export const voiceAgentAPI = {
    * @param {object} customerDetails - Customer information
    */
   async createCall(token, assistantId, phoneNumber, customerDetails = {}) {
-    const response = await fetch(`${API_BASE_URL}/api/voice-agents/${assistantId}/call`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/voice-agents/${assistantId}/call`, {
       method: 'POST',
       headers: getAuthHeaders(token),
       body: JSON.stringify({ phoneNumber, customerDetails })
@@ -425,7 +427,7 @@ export const voiceAgentAPI = {
    * @param {string} callId - Call ID
    */
   async getCall(token, callId) {
-    const response = await fetch(`${API_BASE_URL}/api/voice-agents/calls/${callId}`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/voice-agents/calls/${callId}`, {
       headers: getAuthHeaders(token)
     });
     
@@ -445,7 +447,7 @@ export const voiceAgentAPI = {
   async getCalls(token, assistantId, limit = 100) {
     const params = new URLSearchParams({ limit: limit.toString() });
     
-    const response = await fetch(`${API_BASE_URL}/api/voice-agents/${assistantId}/calls?${params}`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/voice-agents/${assistantId}/calls?${params}`, {
       headers: getAuthHeaders(token)
     });
     
@@ -469,7 +471,7 @@ export const voiceAgentAPI = {
       endDate
     });
 
-    const response = await fetch(`${API_BASE_URL}/api/voice-agents/${assistantId}/analytics?${params}`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/voice-agents/${assistantId}/analytics?${params}`, {
       headers: getAuthHeaders(token)
     });
     
@@ -485,7 +487,7 @@ export const voiceAgentAPI = {
    * @param {string} token - Clerk auth token
    */
   async getVoices(token) {
-    const response = await fetch(`${API_BASE_URL}/api/voice-agents/voices/list`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/voice-agents/voices/list`, {
       headers: getAuthHeaders(token)
     });
     
@@ -507,7 +509,7 @@ export const paymentAPI = {
    * @param {string} email - User email
    */
   async createOrder(token, email) {
-    const response = await fetch(`${API_BASE_URL}/api/checkout`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/checkout`, {
       method: 'POST',
       headers: getAuthHeaders(token),
       body: JSON.stringify({ email })
@@ -526,7 +528,7 @@ export const paymentAPI = {
    * @param {object} paymentData - Payment verification data
    */
   async verifyPayment(paymentData) {
-    const response = await fetch(`${API_BASE_URL}/api/payment/verify`, {
+    const response = await fetch(`${API_BASE_URL_SERVICE}/api/payment/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(paymentData)
@@ -556,7 +558,7 @@ export class QuotaExceededError extends Error {
  * Health check
  */
 export const healthCheck = async () => {
-  const response = await fetch(`${API_BASE_URL}/health`);
+  const response = await fetch(`${API_BASE_URL_SERVICE}/health`);
   return response.json();
 };
 
