@@ -1,0 +1,879 @@
+{
+  "name": "AI Voice Agent Order Confirmation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "order-placed",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Order Placed Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "order-confirmation-trigger"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "resource": "database",
+        "schema": {
+          "value": "public"
+        },
+        "table": {
+          "value": "order_confirmations"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "values": {
+            "order_id": "={{ $json.order_id }}",
+            "customer_name": "={{ $json.customer_name }}",
+            "customer_phone": "={{ $json.customer_phone }}",
+            "order_items": "={{ JSON.stringify($json.order_items) }}",
+            "delivery_address": "={{ $json.delivery_address }}",
+            "expected_delivery": "={{ $json.expected_delivery }}",
+            "order_total": "={{ $json.order_total }}",
+            "status": "pending",
+            "created_at": "={{ new Date().toISOString() }}",
+            "scheduled_call_time": "={{ $json.scheduled_call_time || new Date(Date.now() + 300000).toISOString() }}"
+          }
+        }
+      },
+      "id": "store-order-data",
+      "name": "Store Order Data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [460, 300],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main-db",
+          "name": "Main Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "schedule-checker",
+      "name": "Schedule Checker",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 500]
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "value": "public"
+        },
+        "table": {
+          "value": "order_confirmations"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "status",
+              "condition": "equal",
+              "value": "pending"
+            },
+            {
+              "column": "scheduled_call_time",
+              "condition": "smallerEqual",
+              "value": "={{ new Date().toISOString() }}"
+            }
+          ]
+        },
+        "limit": 10
+      },
+      "id": "get-pending-calls",
+      "name": "Get Pending Calls",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [460, 500],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main-db",
+          "name": "Main Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-pending-orders",
+              "leftValue": "={{ $json.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-pending-orders",
+      "name": "Check Pending Orders",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 500]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "voice-prompt",
+              "name": "voice_prompt",
+              "value": "=Hello {{ $json.customer_name }}! This is an automated confirmation call from {{ $('Store Config').first().json.store_name }}. I'm calling to confirm your recent order #{{ $json.order_id }}. \n\nYour order includes: {{ JSON.parse($json.order_items).map(item => `${item.quantity} x ${item.name}`).join(', ') }}. \n\nThe total amount is ${{ $json.order_total }} and it will be delivered to {{ $json.delivery_address }} on {{ new Date($json.expected_delivery).toLocaleDateString() }}.\n\nCan you please confirm if all these details are correct? You can say 'yes' if everything looks good, or let me know what needs to be changed.",
+              "type": "string"
+            },
+            {
+              "id": "system-prompt",
+              "name": "system_prompt",
+              "value": "You are a professional customer service AI agent calling to confirm order details. Be polite, clear, and helpful. Listen carefully to the customer's response and:\n\n1. If they confirm everything is correct, thank them and end the call\n2. If they want to change something, ask for specific details\n3. If they ask to speak to a human, politely transfer them\n4. If they seem confused or can't hear well, repeat information clearly\n5. Keep the conversation natural and conversational\n\nAlways be patient and professional. The customer's satisfaction is your priority.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "prepare-voice-prompt",
+      "name": "Prepare Voice Prompt",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 500]
+    },
+    {
+      "parameters": {
+        "url": "https://api.retellai.com/v1/call",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "retellAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $credentials.retellAiApi.apiKey }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "from_number",
+              "value": "={{ $('Store Config').first().json.business_phone }}"
+            },
+            {
+              "name": "to_number",
+              "value": "={{ $json.customer_phone }}"
+            },
+            {
+              "name": "override_agent_id",
+              "value": "agent_order_confirmation"
+            },
+            {
+              "name": "retell_llm_dynamic_variables",
+              "value": {
+                "customer_name": "={{ $json.customer_name }}",
+                "order_id": "={{ $json.order_id }}",
+                "order_items": "={{ $json.order_items }}",
+                "delivery_address": "={{ $json.delivery_address }}",
+                "expected_delivery": "={{ $json.expected_delivery }}",
+                "order_total": "={{ $json.order_total }}",
+                "initial_prompt": "={{ $json.voice_prompt }}"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "initiate-voice-call",
+      "name": "Initiate Voice Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 500],
+      "credentials": {
+        "retellAiApi": {
+          "id": "retell-ai-credentials",
+          "name": "Retell AI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "value": "public"
+        },
+        "table": {
+          "value": "order_confirmations"
+        },
+        "updateKey": "order_id",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "values": {
+            "status": "calling",
+            "call_id": "={{ $json.call_id }}",
+            "call_started_at": "={{ new Date().toISOString() }}",
+            "retell_call_id": "={{ $json.call_id }}"
+          }
+        },
+        "where": {
+          "values": [
+            {
+              "column": "order_id",
+              "condition": "equal",
+              "value": "={{ $('Prepare Voice Prompt').item.json.order_id }}"
+            }
+          ]
+        }
+      },
+      "id": "update-call-status",
+      "name": "Update Call Status",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [1340, 500],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main-db",
+          "name": "Main Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "call-webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "call-webhook",
+      "name": "Call Status Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 700],
+      "webhookId": "call-status-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "call-ended",
+              "leftValue": "={{ $json.event }}",
+              "rightValue": "call_ended",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-call-ended",
+      "name": "Check Call Ended",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 700]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse the call transcript and extract key information\nconst transcript = $input.item.json.transcript || '';\nconst callData = $input.item.json;\n\n// Analyze the conversation outcome\nfunction analyzeCallOutcome(transcript) {\n  const lowerTranscript = transcript.toLowerCase();\n  \n  // Check for confirmation keywords\n  const confirmationKeywords = ['yes', 'correct', 'confirmed', 'right', 'okay', 'ok', 'sounds good', 'perfect'];\n  const changeKeywords = ['change', 'wrong', 'incorrect', 'different', 'modify', 'update'];\n  const humanKeywords = ['human', 'person', 'representative', 'speak to someone', 'transfer'];\n  \n  let outcome = 'unknown';\n  let notes = '';\n  \n  if (confirmationKeywords.some(keyword => lowerTranscript.includes(keyword))) {\n    outcome = 'confirmed';\n    notes = 'Customer confirmed order details';\n  } else if (changeKeywords.some(keyword => lowerTranscript.includes(keyword))) {\n    outcome = 'changes_requested';\n    notes = 'Customer requested changes to order';\n  } else if (humanKeywords.some(keyword => lowerTranscript.includes(keyword))) {\n    outcome = 'human_requested';\n    notes = 'Customer requested to speak with human agent';\n  } else if (lowerTranscript.includes('no answer') || lowerTranscript.includes('voicemail')) {\n    outcome = 'no_answer';\n    notes = 'No answer or voicemail';\n  } else {\n    outcome = 'needs_review';\n    notes = 'Call outcome needs manual review';\n  }\n  \n  return { outcome, notes };\n}\n\nconst analysis = analyzeCallOutcome(transcript);\n\nreturn {\n  json: {\n    call_id: callData.call_id,\n    order_id: callData.order_id,\n    outcome: analysis.outcome,\n    notes: analysis.notes,\n    transcript: transcript,\n    call_duration: callData.call_duration_ms || 0,\n    ended_at: new Date().toISOString(),\n    customer_sentiment: callData.customer_sentiment || 'neutral'\n  }\n};"
+      },
+      "id": "analyze-call-outcome",
+      "name": "Analyze Call Outcome",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 700]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "value": "public"
+        },
+        "table": {
+          "value": "order_confirmations"
+        },
+        "updateKey": "order_id",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "values": {
+            "status": "={{ $json.outcome }}",
+            "call_transcript": "={{ $json.transcript }}",
+            "call_outcome": "={{ $json.outcome }}",
+            "call_notes": "={{ $json.notes }}",
+            "call_duration_ms": "={{ $json.call_duration }}",
+            "call_ended_at": "={{ $json.ended_at }}",
+            "customer_sentiment": "={{ $json.customer_sentiment }}"
+          }
+        },
+        "where": {
+          "values": [
+            {
+              "column": "order_id",
+              "condition": "equal",
+              "value": "={{ $json.order_id }}"
+            }
+          ]
+        }
+      },
+      "id": "update-final-status",
+      "name": "Update Final Status",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [900, 700],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main-db",
+          "name": "Main Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "needs-human-intervention",
+              "leftValue": "={{ $json.outcome }}",
+              "rightValue": "human_requested,changes_requested,needs_review",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-human-needed",
+      "name": "Check Human Needed",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1120, 700]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ticket-data",
+              "name": "ticket_data",
+              "value": "={\n  \"order_id\": \"{{ $('Analyze Call Outcome').item.json.order_id }}\",\n  \"customer_name\": \"{{ $('Store Order Data').item.json.customer_name }}\",\n  \"customer_phone\": \"{{ $('Store Order Data').item.json.customer_phone }}\",\n  \"issue_type\": \"{{ $('Analyze Call Outcome').item.json.outcome }}\",\n  \"priority\": \"{{ $('Analyze Call Outcome').item.json.outcome === 'human_requested' ? 'high' : 'medium' }}\",\n  \"description\": \"AI voice agent call outcome: {{ $('Analyze Call Outcome').item.json.notes }}. Please follow up with customer.\",\n  \"call_transcript\": \"{{ $('Analyze Call Outcome').item.json.transcript }}\",\n  \"created_at\": \"{{ new Date().toISOString() }}\"\n}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "create-support-ticket",
+      "name": "Create Support Ticket",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1340, 700]
+    },
+    {
+      "parameters": {
+        "resource": "ticket",
+        "operation": "create",
+        "additionalFields": {
+          "priority": "={{ $json.ticket_data.priority }}",
+          "status": "open",
+          "tags": "ai-voice-agent,order-confirmation"
+        },
+        "description": "={{ $json.ticket_data.description }}",
+        "subject": "=Order Confirmation Follow-up Required - Order #{{ $json.ticket_data.order_id }}",
+        "requesterEmail": "={{ $('Store Config').first().json.support_email }}"
+      },
+      "id": "create-zendesk-ticket",
+      "name": "Create Zendesk Ticket",
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [1560, 700],
+      "credentials": {
+        "zendeskApi": {
+          "id": "zendesk-support",
+          "name": "Zendesk Support"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Store Config').first().json.slack_webhook_url }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "=🔔 Order Confirmation Alert - Order #{{ $('Analyze Call Outcome').item.json.order_id }}"
+            },
+            {
+              "name": "attachments",
+              "value": [
+                {
+                  "color": "warning",
+                  "title": "Customer Requires Human Assistance",
+                  "fields": [
+                    {
+                      "title": "Order ID",
+                      "value": "={{ $('Analyze Call Outcome').item.json.order_id }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Customer",
+                      "value": "={{ $('Store Order Data').item.json.customer_name }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Issue Type",
+                      "value": "={{ $('Analyze Call Outcome').item.json.outcome }}",
+                      "short": true
+                    },
+                    {
+                      "title": "Notes",
+                      "value": "={{ $('Analyze Call Outcome').item.json.notes }}",
+                      "short": false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notify-team-slack",
+      "name": "Notify Team (Slack)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1340, 900]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "store-name",
+              "name": "store_name",
+              "value": "Your Store Name",
+              "type": "string"
+            },
+            {
+              "id": "business-phone",
+              "name": "business_phone",
+              "value": "+1234567890",
+              "type": "string"
+            },
+            {
+              "id": "support-email",
+              "name": "support_email",
+              "value": "support@yourstore.com",
+              "type": "string"
+            },
+            {
+              "id": "slack-webhook",
+              "name": "slack_webhook_url",
+              "value": "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "store-config",
+      "name": "Store Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [240, 100]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "daily-cleanup",
+      "name": "Daily Cleanup",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 1100]
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "schema": {
+          "value": "public"
+        },
+        "table": {
+          "value": "order_confirmations"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "created_at",
+              "condition": "smaller",
+              "value": "={{ new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() }}"
+            }
+          ]
+        }
+      },
+      "id": "cleanup-old-records",
+      "name": "Cleanup Old Records",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [460, 1100],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main-db",
+          "name": "Main Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"success\": true, \"message\": \"Order confirmation scheduled\", \"order_id\": \"{{ $json.order_id }}\"}",
+        "options": {}
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "retry-failed-calls",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "retry-webhook",
+      "name": "Retry Failed Calls",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 1300],
+      "webhookId": "retry-failed-calls"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "value": "public"
+        },
+        "table": {
+          "value": "order_confirmations"
+        },
+        "where": {
+          "values": [
+            {
+              "column": "status",
+              "condition": "equal",
+              "value": "no_answer"
+            },
+            {
+              "column": "retry_count",
+              "condition": "smaller",
+              "value": "3"
+            }
+          ]
+        },
+        "limit": 5
+      },
+      "id": "get-retry-calls",
+      "name": "Get Retry Calls",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [460, 1300],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main-db",
+          "name": "Main Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": {
+          "value": "public"
+        },
+        "table": {
+          "value": "order_confirmations"
+        },
+        "updateKey": "order_id",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "values": {
+            "status": "pending",
+            "retry_count": "={{ ($json.retry_count || 0) + 1 }}",
+            "scheduled_call_time": "={{ new Date(Date.now() + 1800000).toISOString() }}"
+          }
+        },
+        "where": {
+          "values": [
+            {
+              "column": "order_id",
+              "condition": "equal",
+              "value": "={{ $json.order_id }}"
+            }
+          ]
+        }
+      },
+      "id": "schedule-retry",
+      "name": "Schedule Retry",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [680, 1300],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main-db",
+          "name": "Main Database"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Order Placed Webhook": {
+      "main": [
+        [
+          {
+            "node": "Store Order Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Order Data": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Checker": {
+      "main": [
+        [
+          {
+            "node": "Get Pending Calls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Pending Calls": {
+      "main": [
+        [
+          {
+            "node": "Check Pending Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Pending Orders": {
+      "main": [
+        [
+          {
+            "node": "Prepare Voice Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Voice Prompt": {
+      "main": [
+        [
+          {
+            "node": "Initiate Voice Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initiate Voice Call": {
+      "main": [
+        [
+          {
+            "node": "Update Call Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Status Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Call Ended",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Call Ended": {
+      "main": [
+        [
+          {
+            "node": "Analyze Call Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Call Outcome": {
+      "main": [
+        [
+          {
+            "node": "Update Final Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Final Status": {
+      "main": [
+        [
+          {
+            "node": "Check Human Needed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Human Needed": {
+      "main": [
+        [
+          {
+            "node": "Create Support Ticket",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Team (Slack)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Support Ticket": {
+      "main": [
+        [
+          {
+            "node": "Create Zendesk Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Cleanup": {
+      "main": [
+        [
+          {
+            "node": "Cleanup Old Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Failed Calls": {
+      "main": [
+        [
+          {
+            "node": "Get Retry Calls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Retry Calls": {
+      "main": [
+        [
+          {
+            "node": "Schedule Retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "voice-agent",
+      "name": "voice-agent"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
