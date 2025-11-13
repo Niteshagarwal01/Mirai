@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import '../css/login-styles.css';
 
 const Login = () => {
-  const { signIn, setActive } = useSignIn();
+  const { signIn, setActive, isLoaded } = useSignIn();
   const { isSignedIn } = useAuth();
   const navigate = useNavigate();
   
@@ -137,14 +137,24 @@ const Login = () => {
             {error && <div className="error-message">{error}</div>}
             
             {/* Google Sign-In First (Primary Method) */}
-            <button 
-              type="button" 
-              className="google-btn" 
-              onClick={() => signIn.authenticateWithRedirect({
-                strategy: "oauth_google",
-                redirectUrl: "/sso-callback",
-                redirectUrlComplete: "/admin"
-              })}
+            <button
+              type="button"
+              className="google-btn"
+              onClick={async () => {
+                if (!isLoaded || !signIn) {
+                  console.warn('Clerk signIn not ready yet');
+                  return;
+                }
+                try {
+                  await signIn.authenticateWithRedirect({
+                    strategy: 'oauth_google',
+                    redirectUrl: '/sso-callback',
+                    redirectUrlComplete: '/admin'
+                  });
+                } catch (e) {
+                  console.error('Google sign-in redirect failed', e);
+                }
+              }}
               style={{ marginBottom: '20px' }}
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

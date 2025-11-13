@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import '../css/registration-styles.css';
 
 const Signup = () => {
-  const { signUp, setActive } = useSignUp();
+  const { signUp, setActive, isLoaded } = useSignUp();
   const { isSignedIn } = useAuth();
   const navigate = useNavigate();
   
@@ -243,14 +243,24 @@ const Signup = () => {
                     <span>Or continue with</span>
                   </div>
 
-                  <button 
-                    type="button" 
-                    className="google-btn" 
-                    onClick={() => signUp.authenticateWithRedirect({
-                      strategy: "oauth_google",
-                      redirectUrl: "/sso-callback",
-                      redirectUrlComplete: "/admin"
-                    })}
+                  <button
+                    type="button"
+                    className="google-btn"
+                    onClick={async () => {
+                      if (!isLoaded || !signUp) {
+                        console.warn('Clerk signUp not ready yet');
+                        return;
+                      }
+                      try {
+                        await signUp.authenticateWithRedirect({
+                          strategy: 'oauth_google',
+                          redirectUrl: '/sso-callback',
+                          redirectUrlComplete: '/admin'
+                        });
+                      } catch (e) {
+                        console.error('Google sign-up redirect failed', e);
+                      }
+                    }}
                   >
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M19.8055 10.2292C19.8055 9.55208 19.7501 8.86806 19.6323 8.19792H10.2V12.0488H15.6014C15.3773 13.2911 14.6571 14.3898 13.6025 15.0879V17.5866H16.8251C18.7173 15.8449 19.8055 13.2728 19.8055 10.2292Z" fill="#4285F4"/>
