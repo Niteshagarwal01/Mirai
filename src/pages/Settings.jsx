@@ -81,7 +81,7 @@ const Settings = () => {
                   <label>Full Name</label>
                   <input 
                     type="text" 
-                    value={user?.fullName || ''}
+                    value={user?.get('firstName') || user?.get('username') || ''}
                     placeholder="Your full name"
                     disabled
                   />
@@ -91,7 +91,7 @@ const Settings = () => {
                   <label>Email Address</label>
                   <input 
                     type="email" 
-                    value={user?.primaryEmailAddress?.emailAddress || ''}
+                    value={user?.get('email') || ''}
                     placeholder="Your email address"
                     disabled
                   />

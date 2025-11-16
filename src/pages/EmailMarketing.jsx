@@ -1,229 +1,538 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@clerk/clerk-react';
+import API_BASE_URL from '../config/api';
 import '../css/content-generator.css';
-import '../css/voice-agent.css';
 
 const EmailMarketing = () => {
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [campaignData, setCampaignData] = useState({
-    name: '',
-    type: 'newsletter',
-    subject: '',
-    content: '',
-    contacts: null
+  const navigate = useNavigate();
+  const { getToken } = useAuth();
+  const [showSetupModal, setShowSetupModal] = useState(false);
+  const [setupForm, setSetupForm] = useState({
+    companyName: '',
+    email: '',
+    phone: '',
+    industry: '',
+    currentEmailVolume: '',
+    requirements: ''
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  const handleCreateCampaign = () => {
-    alert('🚧 Email Campaign creation is under development! This beautiful interface is ready for when our AI backend is connected.');
+  const handleInputChange = (e) => {
+    setSetupForm({
+      ...setupForm,
+      [e.target.name]: e.target.value
+    });
   };
 
-  const handleFileUpload = (event) => {
-    const files = event.target.files;
-    setCampaignData({...campaignData, contacts: files});
+  const handleSubmitSetup = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    try {
+      const token = await getToken();
+      const response = await fetch(`${API_BASE_URL}/api/email-setup/request`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(setupForm)
+      });
+
+      if (response.ok) {
+        setSubmitSuccess(true);
+        setTimeout(() => {
+          setShowSetupModal(false);
+          setSubmitSuccess(false);
+          setSetupForm({
+            companyName: '',
+            email: '',
+            phone: '',
+            industry: '',
+            currentEmailVolume: '',
+            requirements: ''
+          });
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Error submitting setup request:', error);
+      alert('Failed to submit request. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div className="content-generator">
-      <div className="page-header">
-        <div className="header-icon">
-          <i className="fas fa-envelope"></i>
+    <div className="content-generator-page">
+      {/* Header */}
+      <div className="dashboard-header">
+        <div>
+          <h1>Email Marketing Engine</h1>
+          <p>LangGraph-Powered Email Automation - Fully Functional & Tested!</p>
         </div>
-        <div className="header-content">
-          <h1>Email <span className="gradient-text">Marketing</span></h1>
-          <p>Create and manage AI-powered email campaigns</p>
-        </div>
-        <button 
-          className="create-assistant-btn"
-          onClick={() => setShowCreateForm(true)}
-        >
-          <i className="fas fa-plus"></i>
-          New Campaign
-        </button>
-      </div>
-
-      <div className="container">
-        {/* Stats Cards */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-header">
-              <h3>Active Campaigns</h3>
-            </div>
-            <div className="stat-value">0</div>
-            <div className="stat-label">Currently running campaigns</div>
-          </div>
-              
-          <div className="stat-card">
-            <div className="stat-header">
-              <h3>Total Emails Sent</h3>
-            </div>
-            <div className="stat-value">0</div>
-            <div className="stat-label">This month</div>
-          </div>
-              
-          <div className="stat-card">
-            <div className="stat-header">
-              <h3>Average Open Rate</h3>
-            </div>
-            <div className="stat-value">24.5%</div>
-            <div className="stat-label">Last 30 days</div>
-          </div>
-        </div>
-
-        {/* Action Tabs */}
-        <div className="action-tabs">
-          <button className="tab-btn active">
-            <i className="fas fa-envelope"></i>
-            Campaigns
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button className="btn-primary" onClick={() => setShowSetupModal(true)}>
+            <i className="fas fa-crown"></i> Get Custom Setup
           </button>
-          <button className="tab-btn">
-            <i className="fas fa-chart-bar"></i>
-            Analytics
-          </button>
-          <button className="tab-btn">
-            <i className="fas fa-cog"></i>
-            Templates
-          </button>
-        </div>
-
-        {/* Empty State */}
-        <div className="empty-state">
-          <div className="empty-icon">
-            <i className="fas fa-envelope"></i>
-          </div>
-          <h2>No Email Campaigns Yet</h2>
-          <p>Create your first AI-powered email campaign to start reaching your customers.</p>
-          <button 
-            className="create-first-btn"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setShowCreateForm(true);
-            }}
-          >
-            <i className="fas fa-plus"></i>
-            Create Your First Campaign
+          <button className="btn-secondary" onClick={() => navigate('/admin')}>
+            <i className="fas fa-arrow-left"></i> Back
           </button>
         </div>
       </div>
 
-      {/* Modal Overlay */}
-      {showCreateForm && (
-        <div className="modal-overlay" onClick={() => setShowCreateForm(false)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="create-form-container">
-              <div className="form-header">
-                <h2>
-                  <i className="fas fa-envelope"></i>
-                  Create Email Campaign
-                </h2>
-                <button 
-                  className="close-btn"
-                  onClick={() => setShowCreateForm(false)}
-                >
-                  <i className="fas fa-times"></i>
-                </button>
+      {/* Premium Banner */}
+      <div style={{ 
+        background: 'linear-gradient(135deg, rgba(110, 64, 255, 0.1) 0%, rgba(110, 64, 255, 0.05) 100%)',
+        border: '2px solid rgba(255, 193, 7, 0.3)',
+        borderRadius: '16px',
+        padding: '30px',
+        marginBottom: '30px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{
+            width: '60px',
+            height: '60px',
+            background: 'linear-gradient(135deg, #ffc107 0%, #ff9800 100%)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '28px'
+          }}>
+            <i className="fas fa-crown"></i>
+          </div>
+          <div style={{ flex: 1 }}>
+            <h2 style={{ marginBottom: '10px', fontSize: '1.5rem' }}>
+              <i className="fas fa-sparkles"></i> Premium Feature - Contact Us for Setup
+            </h2>
+            <p style={{ marginBottom: '15px', opacity: 0.9 }}>
+              Our LangGraph email automation system is fully built and tested with real campaigns. 
+              Get personalized setup with your brand details, Gmail credentials, and custom email templates.
+            </p>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <span className="feature-tag"><i className="fas fa-check"></i> Proven & Working</span>
+              <span className="feature-tag"><i className="fas fa-check"></i> Custom Brand Setup</span>
+              <span className="feature-tag"><i className="fas fa-check"></i> Gmail Integration</span>
+              <span className="feature-tag"><i className="fas fa-check"></i> Excel Contact Management</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Status */}
+      <div style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        padding: '20px',
+        marginBottom: '30px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px'
+      }}>
+        <i className="fas fa-circle" style={{ color: '#ef4444', fontSize: '12px' }}></i>
+        <span style={{ fontSize: '0.95rem', fontWeight: 500 }}>AUTOMATION STOPPED</span>
+      </div>
+
+      {/* What You Get */}
+      <div className="content-type-selection">
+        <h2><i className="fas fa-gift"></i> What You Get</h2>
+        <div className="content-types-grid">
+          <div className="content-type-card">
+            <div className="type-image" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #6e40ff 0%, #5530c7 100%)',
+              boxShadow: '0 0 20px rgba(110, 64, 255, 0.3)'
+            }}>
+              <span style={{
+                fontSize: '32px',
+                fontWeight: 700,
+                color: 'white',
+                textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+              }}>1</span>
+            </div>
+            <div className="type-info">
+              <h3 style={{ fontSize: '1.1rem' }}><i className="fas fa-building" style={{ fontSize: '0.9rem' }}></i> One-Time Brand Setup</h3>
+              <p style={{ fontSize: '0.9rem' }}>
+                We configure your company details, brand voice, and product information 
+                into the LangGraph system
+              </p>
+            </div>
+          </div>
+
+          <div className="content-type-card">
+            <div className="type-image" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #6e40ff 0%, #5530c7 100%)',
+              boxShadow: '0 0 20px rgba(110, 64, 255, 0.3)'
+            }}>
+              <span style={{
+                fontSize: '32px',
+                fontWeight: 700,
+                color: 'white',
+                textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+              }}>2</span>
+            </div>
+            <div className="type-info">
+              <h3 style={{ fontSize: '1.1rem' }}><i className="fas fa-envelope" style={{ fontSize: '0.9rem' }}></i> Gmail Integration</h3>
+              <p style={{ fontSize: '0.9rem' }}>
+                Connect your Gmail account securely for automated inbox monitoring 
+                and email sending
+              </p>
+            </div>
+          </div>
+
+          <div className="content-type-card">
+            <div className="type-image" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #6e40ff 0%, #5530c7 100%)',
+              boxShadow: '0 0 20px rgba(110, 64, 255, 0.3)'
+            }}>
+              <span style={{
+                fontSize: '32px',
+                fontWeight: 700,
+                color: 'white',
+                textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+              }}>3</span>
+            </div>
+            <div className="type-info">
+              <h3 style={{ fontSize: '1.1rem' }}><i className="fas fa-file-excel" style={{ fontSize: '0.9rem' }}></i> Upload Contacts</h3>
+              <p style={{ fontSize: '0.9rem' }}>
+                Simply upload your Excel/CSV contact list with company names, 
+                emails, and roles
+              </p>
+            </div>
+          </div>
+
+          <div className="content-type-card">
+            <div className="type-image" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #6e40ff 0%, #5530c7 100%)',
+              boxShadow: '0 0 20px rgba(110, 64, 255, 0.3)'
+            }}>
+              <span style={{
+                fontSize: '32px',
+                fontWeight: 700,
+                color: 'white',
+                textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+              }}>4</span>
+            </div>
+            <div className="type-info">
+              <h3 style={{ fontSize: '1.1rem' }}><i className="fas fa-rocket" style={{ fontSize: '0.9rem' }}></i> Launch & Monitor</h3>
+              <p style={{ fontSize: '0.9rem' }}>
+                Execute campaigns from our dashboard and track responses in real-time
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Capabilities */}
+      <div className="content-type-selection">
+        <h2><i className="fas fa-cog"></i> System Capabilities</h2>
+        <div className="content-types-grid">
+          <div className="content-type-card">
+            <div className="type-image" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #1a1c24 0%, #252836 100%)',
+              boxShadow: '0 0 15px rgba(110, 64, 255, 0.2)'
+            }}>
+              <i className="fas fa-inbox fa-2x" style={{ color: '#6e40ff', filter: 'drop-shadow(0 0 8px rgba(110, 64, 255, 0.5))' }}></i>
+            </div>
+            <div className="type-info">
+              <h3 style={{ fontSize: '1.1rem' }}>Automated Inbox Monitoring</h3>
+              <p style={{ fontSize: '0.85rem' }}>
+                Continuously monitors your Gmail Inbox for new customer emails 
+                using Gmail API integration.
+              </p>
+              <ul className="feature-list" style={{ 
+                listStyle: 'none', 
+                padding: 0, 
+                marginTop: '10px',
+                fontSize: '0.85rem'
+              }}>
+                <li><i className="fas fa-check" style={{ color: '#10b981', marginRight: '8px', fontSize: '0.8rem' }}></i> Real-time email detection</li>
+                <li><i className="fas fa-check" style={{ color: '#10b981', marginRight: '8px', fontSize: '0.8rem' }}></i> Automatic categorization</li>
+                <li><i className="fas fa-check" style={{ color: '#10b981', marginRight: '8px', fontSize: '0.8rem' }}></i> Smart filtering</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="content-type-card">
+            <div className="type-image" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #1a1c24 0%, #252836 100%)',
+              boxShadow: '0 0 15px rgba(110, 64, 255, 0.2)'
+            }}>
+              <i className="fas fa-tag fa-2x" style={{ color: '#6e40ff', filter: 'drop-shadow(0 0 8px rgba(110, 64, 255, 0.5))' }}></i>
+            </div>
+            <div className="type-info">
+              <h3 style={{ fontSize: '1.1rem' }}>AI-Powered Categorization</h3>
+              <p style={{ fontSize: '0.85rem' }}>
+                Automatically classifies incoming emails into relevant categories 
+                using advanced AI.
+              </p>
+              <ul className="feature-list" style={{ 
+                listStyle: 'none', 
+                padding: 0, 
+                marginTop: '10px',
+                fontSize: '0.85rem'
+              }}>
+                <li><i className="fas fa-check" style={{ color: '#10b981', marginRight: '8px', fontSize: '0.8rem' }}></i> Product inquiries</li>
+                <li><i className="fas fa-check" style={{ color: '#10b981', marginRight: '8px', fontSize: '0.8rem' }}></i> Customer feedback</li>
+                <li><i className="fas fa-check" style={{ color: '#10b981', marginRight: '8px', fontSize: '0.8rem' }}></i> Partnerships & More</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="content-type-card">
+            <div className="type-image" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #1a1c24 0%, #252836 100%)',
+              boxShadow: '0 0 15px rgba(110, 64, 255, 0.2)'
+            }}>
+              <i className="fas fa-brain fa-2x" style={{ color: '#6e40ff', filter: 'drop-shadow(0 0 8px rgba(110, 64, 255, 0.5))' }}></i>
+            </div>
+            <div className="type-info">
+              <h3 style={{ fontSize: '1.1rem' }}>Intelligent Auto-Response</h3>
+              <p style={{ fontSize: '0.85rem' }}>
+                Generates personalized responses based on email context and your 
+                brand voice.
+              </p>
+              <ul className="feature-list" style={{ 
+                listStyle: 'none', 
+                padding: 0, 
+                marginTop: '10px',
+                fontSize: '0.85rem'
+              }}>
+                <li><i className="fas fa-check" style={{ color: '#10b981', marginRight: '8px', fontSize: '0.8rem' }}></i> Context-aware replies</li>
+                <li><i className="fas fa-check" style={{ color: '#10b981', marginRight: '8px', fontSize: '0.8rem' }}></i> Brand voice matching</li>
+                <li><i className="fas fa-check" style={{ color: '#10b981', marginRight: '8px', fontSize: '0.8rem' }}></i> Professional tone</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="content-type-card">
+            <div className="type-image" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #1a1c24 0%, #252836 100%)',
+              boxShadow: '0 0 15px rgba(110, 64, 255, 0.2)'
+            }}>
+              <i className="fas fa-database fa-2x" style={{ color: '#6e40ff', filter: 'drop-shadow(0 0 8px rgba(110, 64, 255, 0.5))' }}></i>
+            </div>
+            <div className="type-info">
+              <h3 style={{ fontSize: '1.1rem' }}>Smart Lead Management</h3>
+              <p style={{ fontSize: '0.85rem' }}>
+                Stores lead information and prevents duplicate outreach for better 
+                relationship management.
+              </p>
+              <ul className="feature-list" style={{ 
+                listStyle: 'none', 
+                padding: 0, 
+                marginTop: '10px',
+                fontSize: '0.85rem'
+              }}>
+                <li><i className="fas fa-check" style={{ color: '#10b981', marginRight: '8px', fontSize: '0.8rem' }}></i> Lead tracking</li>
+                <li><i className="fas fa-check" style={{ color: '#10b981', marginRight: '8px', fontSize: '0.8rem' }}></i> Duplicate prevention</li>
+                <li><i className="fas fa-check" style={{ color: '#10b981', marginRight: '8px', fontSize: '0.8rem' }}></i> Follow-up scheduling</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Setup Modal */}
+      {showSetupModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }} onClick={() => setShowSetupModal(false)}>
+          <div style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
+            borderRadius: '20px',
+            maxWidth: '550px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            boxShadow: '0 20px 60px rgba(110, 64, 255, 0.3), 0 0 40px rgba(110, 64, 255, 0.1)',
+            animation: 'modalSlideIn 0.3s ease-out'
+          }} onClick={(e) => e.stopPropagation()}>
+            <div style={{
+              padding: '25px',
+              borderBottom: '1px solid var(--border)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <h2 style={{ margin: 0 }}><i className="fas fa-crown"></i> Request Custom Setup</h2>
+              <button onClick={() => setShowSetupModal(false)} style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-main)',
+                fontSize: '24px',
+                cursor: 'pointer',
+                padding: '0',
+                width: '32px',
+                height: '32px'
+              }}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+
+            {submitSuccess ? (
+              <div style={{
+                padding: '50px',
+                textAlign: 'center'
+              }}>
+                <i className="fas fa-check-circle" style={{
+                  fontSize: '56px',
+                  color: '#10b981',
+                  marginBottom: '20px',
+                  filter: 'drop-shadow(0 0 20px rgba(16, 185, 129, 0.5))'
+                }}></i>
+                <h3 style={{ marginBottom: '10px', fontSize: '1.5rem' }}>Request Submitted!</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+                  We'll contact you shortly to set up your email automation system.
+                </p>
               </div>
+            ) : (
+              <form onSubmit={handleSubmitSetup} style={{ padding: '25px' }}>
+                <div className="form-group">
+                  <label htmlFor="companyName">
+                    <i className="fas fa-building"></i> Company Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="companyName"
+                    name="companyName"
+                    value={setupForm.companyName}
+                    onChange={handleInputChange}
+                    required
+                    placeholder="Your company name"
+                  />
+                </div>
 
-              <div className="form-content">
-                <div className="form-section">
-                  <div className="form-row">
-                    <div className="form-group half">
-                      <label>Campaign Name*</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Newsletter Campaign"
-                        value={campaignData.name}
-                        onChange={(e) => setCampaignData({...campaignData, name: e.target.value})}
-                      />
-                    </div>
-                    <div className="form-group half">
-                      <label>Campaign Type</label>
-                      <select
-                        value={campaignData.type}
-                        onChange={(e) => setCampaignData({...campaignData, type: e.target.value})}
-                      >
-                        <option value="newsletter">Newsletter</option>
-                        <option value="promotional">Promotional</option>
-                        <option value="welcome">Welcome Series</option>
-                        <option value="announcement">Announcement</option>
-                      </select>
-                    </div>
-                  </div>
-
+                <div className="form-row">
                   <div className="form-group">
-                    <label>Subject Line*</label>
+                    <label htmlFor="email">
+                      <i className="fas fa-envelope"></i> Email *
+                    </label>
                     <input
-                      type="text"
-                      placeholder="Enter compelling subject line..."
-                      value={campaignData.subject}
-                      onChange={(e) => setCampaignData({...campaignData, subject: e.target.value})}
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={setupForm.email}
+                      onChange={handleInputChange}
+                      required
+                      placeholder="your@email.com"
                     />
                   </div>
 
                   <div className="form-group">
-                    <label>Email Content*</label>
-                    <textarea
-                      rows="6"
-                      placeholder="Describe your email content or let AI generate it for you..."
-                      value={campaignData.content}
-                      onChange={(e) => setCampaignData({...campaignData, content: e.target.value})}
-                    ></textarea>
-                    <div className="form-hint">
-                      <i className="fas fa-info-circle"></i>
-                      Our AI will generate professional email content based on your description.
-                    </div>
+                    <label htmlFor="phone">
+                      <i className="fas fa-phone"></i> Phone
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={setupForm.phone}
+                      onChange={handleInputChange}
+                      placeholder="+1 234 567 8900"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="industry">
+                      <i className="fas fa-industry"></i> Industry
+                    </label>
+                    <input
+                      type="text"
+                      id="industry"
+                      name="industry"
+                      value={setupForm.industry}
+                      onChange={handleInputChange}
+                      placeholder="e.g., SaaS, E-commerce"
+                    />
                   </div>
 
                   <div className="form-group">
-                    <label>Upload Contact List*</label>
-                    <div className="file-upload-area">
-                      <input
-                        type="file"
-                        id="contacts"
-                        multiple
-                        accept=".csv,.xlsx"
-                        onChange={handleFileUpload}
-                        style={{display: 'none'}}
-                      />
-                      <label htmlFor="contacts" className="file-upload-label">
-                        <i className="fas fa-upload"></i>
-                        <span>Drag & drop CSV or Excel files here, or click to select</span>
-                        <div className="supported-formats">Supported formats: CSV, Excel</div>
-                      </label>
-                    </div>
-                    <div className="form-hint">
-                      <i className="fas fa-info-circle"></i>
-                      Upload CSV or Excel files containing email addresses. First column should be 'email'.
-                    </div>
+                    <label htmlFor="currentEmailVolume">
+                      <i className="fas fa-chart-line"></i> Monthly Email Volume
+                    </label>
+                    <select
+                      id="currentEmailVolume"
+                      name="currentEmailVolume"
+                      value={setupForm.currentEmailVolume}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Select volume</option>
+                      <option value="0-1000">0 - 1,000</option>
+                      <option value="1000-5000">1,000 - 5,000</option>
+                      <option value="5000-10000">5,000 - 10,000</option>
+                      <option value="10000+">10,000+</option>
+                    </select>
                   </div>
-
-                  <div className="form-row">
-                    <div className="form-group half">
-                      <label>Send Schedule</label>
-                      <select>
-                        <option value="immediate">Send Immediately</option>
-                        <option value="scheduled">Schedule for Later</option>
-                        <option value="recurring">Recurring Campaign</option>
-                      </select>
-                    </div>
-
-                    <div className="form-group half">
-                      <label>Time Zone</label>
-                      <select>
-                        <option value="EST">Eastern Time (EST)</option>
-                        <option value="CST">Central Time (CST)</option>
-                        <option value="MST">Mountain Time (MST)</option>
-                        <option value="PST">Pacific Time (PST)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <button className="create-btn" onClick={handleCreateCampaign}>
-                    <i className="fas fa-paper-plane"></i>
-                    Create Campaign
-                  </button>
                 </div>
-              </div>
-            </div>
+
+                <div className="form-group">
+                  <label htmlFor="requirements">
+                    <i className="fas fa-list"></i> Requirements & Goals
+                  </label>
+                  <textarea
+                    id="requirements"
+                    name="requirements"
+                    value={setupForm.requirements}
+                    onChange={handleInputChange}
+                    rows="4"
+                    placeholder="Tell us about your email automation needs, campaign goals, and any specific requirements..."
+                  />
+                </div>
+
+                <button type="submit" className="btn-primary btn-full" disabled={submitting}>
+                  {submitting ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i> Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-paper-plane"></i> Submit Request
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}

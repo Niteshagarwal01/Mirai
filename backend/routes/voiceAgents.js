@@ -1,6 +1,6 @@
 import express from 'express';
 import VapiService from '../lib/vapi.js';
-import { requireAuth } from '../middleware/clerkAuth.js';
+import { requireAuth } from '../middleware/clerk.js';
 
 const router = express.Router();
 
@@ -8,7 +8,7 @@ const router = express.Router();
 router.post('/create', requireAuth, async (req, res) => {
   try {
     const { name, type, description, systemPrompt, voiceId, firstMessage, endCallMessage } = req.body;
-    const userId = req.auth.userId;
+    const userId = req.user.clerkUserId;
 
     // Validate required fields
     if (!name || !description) {

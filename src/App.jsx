@@ -1,21 +1,19 @@
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useUser } from '@clerk/clerk-react'
 import { AuthenticateWithRedirectCallback } from '@clerk/clerk-react'
 import Home from './pages/Home.jsx'
 import Login from './pages/login.jsx'
 import Signup from './pages/signup.jsx'
+import DesktopOnly from './pages/DesktopOnly.jsx'
 import AdminDashboard from './pages/AdminDashboard.jsx'
-import ContentGenerator from './pages/ContentGenerator.jsx'
-import UpgradeToPro from './pages/UpgradeToPro.jsx'
-import PaymentPage from './pages/PaymentPage.jsx'
-import BusinessPlanner from './pages/BusinessPlanner.jsx'
+import MediaStudio from './pages/MediaStudio.jsx'
+import ContentCreator from './pages/ContentCreator.jsx'
 import EmailMarketing from './pages/EmailMarketing.jsx'
 import VoiceAgent from './pages/VoiceAgent.jsx'
-import Chatbot from './pages/Chatbot.jsx'
-import AIPhotoshoot from './pages/AIPhotoshoot.jsx'
-import AIVideoShoot from './pages/AIVideoShoot.jsx'
-import Settings from './pages/Settings.jsx'
+import VoiceTest from './pages/VoiceTest.jsx'
+import UpgradeToPro from './pages/UpgradeToPro.jsx'
+import PaymentPage from './pages/PaymentPage.jsx'
 import { NotFound } from './ErrorBoundary.jsx'
 import './css/App.css'
 import './css/custom-login-fix.css'
@@ -72,6 +70,24 @@ const ProtectedRoute = ({ element }) => {
 
 function App() {
   const location = useLocation();
+  const [isDesktop, setIsDesktop] = useState(true);
+
+  // Check if device is desktop (minimum 1024px width)
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
+    
+    return () => window.removeEventListener('resize', checkDevice);
+  }, []);
+
+  // If not desktop, show DesktopOnly page
+  if (!isDesktop) {
+    return <DesktopOnly />;
+  }
 
   // Custom cursor functionality
   useEffect(() => {
@@ -148,19 +164,18 @@ function App() {
             element={<ProtectedRoute element={<AdminDashboard />} />}
           >
             <Route index element={<AdminDashboard />} />
-            <Route path="content" element={<ContentGenerator />} />
-            <Route path="business-planner" element={<BusinessPlanner />} />
-            <Route path="email-marketing" element={<EmailMarketing />} />
+            <Route path="media-studio" element={<MediaStudio />} />
+            <Route path="content-creator" element={<ContentCreator />} />
+            <Route path="email-engine" element={<EmailMarketing />} />
             <Route path="voice-agent" element={<VoiceAgent />} />
-            <Route path="chatbot" element={<Chatbot />} />
-            <Route path="ai-photoshoot" element={<AIPhotoshoot />} />
-            <Route path="ai-videoshoot" element={<AIVideoShoot />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="voice-test" element={<VoiceTest />} />
           </Route>
           
           {/* Backward compatibility */}
-          <Route path="/business-planner" element={<Navigate to="/admin/business-planner" replace />} />
-          <Route path="/content-generator" element={<Navigate to="/admin/content" replace />} />
+          <Route path="/business-planner" element={<Navigate to="/admin" replace />} />
+          <Route path="/content-generator" element={<Navigate to="/admin/content-creator" replace />} />
+          <Route path="/ai-photoshoot" element={<Navigate to="/admin/media-studio" replace />} />
+          <Route path="/ai-videoshoot" element={<Navigate to="/admin/media-studio" replace />} />
           
           {/* 404 route */}
           <Route path="*" element={<NotFound />} />

@@ -87,8 +87,8 @@ body.registration-page::before {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 70px 50px;
-    overflow-y: hidden;
+    padding: 40px 30px;
+    overflow-y: auto;
     overflow-x: hidden;
     box-sizing: border-box;
 }
@@ -100,10 +100,10 @@ body.registration-page::before {
 }
 
 .registration-content h3 {
-    font-size: 22px;
+    font-size: 28px;
     margin-bottom: 20px;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.95);
     font-weight: 600;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -134,7 +134,7 @@ body.registration-page::before {
 .feature-highlight-box p {
     margin: 0;
     color: rgba(255, 255, 255, 0.85);
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -225,9 +225,9 @@ body.registration-page::before {
 
 .feature-desc {
     color: #ffffff;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     max-width: 100%;
     overflow-wrap: break-word;
     word-wrap: break-word;
@@ -252,9 +252,9 @@ body.registration-page::before {
 }
 
 .feature-text-box {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 13px;
-    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 15px;
+    line-height: 1.6;
     max-width: 100%;
     overflow-wrap: break-word;
     word-wrap: break-word;
@@ -262,14 +262,14 @@ body.registration-page::before {
 }
 
 .registration-form-container {
-    max-width: 420px;
+    max-width: 450px;
     width: 100%;
     padding: 0;
 }
 
 .registration-form-container h2 {
-    font-size: 36px;
-    margin-bottom: 12px;
+    font-size: 32px;
+    margin-bottom: 10px;
     color: #fff;
     font-weight: 700;
     letter-spacing: -0.5px;
@@ -284,30 +284,30 @@ body.registration-page::before {
 
 .registration-subtitle {
     color: #c4c4ce;
-    margin-bottom: 28px;
+    margin-bottom: 22px;
     font-size: 14px;
     line-height: 1.5;
 }
 
 .create-account-btn {
     width: 100%;
-    padding: 11px;
+    padding: 10px;
     background: linear-gradient(135deg, #6e40ff 0%, #5230d1 100%);
     color: #fff;
     border: none;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     cursor: pointer;
-    margin-top: 6px;
-    margin-bottom: 6px;
+    margin-top: 4px;
+    margin-bottom: 4px;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(110, 64, 255, 0.3);
-    height: 40px;
+    height: 42px;
 }
 
 .create-account-btn:hover {
@@ -332,7 +332,7 @@ body.registration-page::before {
 
 /* Shared styles with login form */
 .form-group {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .form-group label {
@@ -345,12 +345,12 @@ body.registration-page::before {
 
 .form-group input {
     width: 100%;
-    padding: 11px 14px;
+    padding: 10px 14px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     color: #fff;
-    font-size: 13px;
+    font-size: 14px;
     transition: all 0.3s ease;
     box-sizing: border-box;
 }
@@ -583,7 +583,7 @@ body.registration-page::before {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
   padding: 0 8px;
 }
 

@@ -1,378 +1,405 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '@clerk/clerk-react';
-import { voiceAgentAPI } from '../services/backendAPI.js';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Vapi from '@vapi-ai/web';
 import '../css/content-generator.css';
-import '../css/voice-agent.css';
 
 const VoiceAgent = () => {
-  const { getToken } = useAuth();
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [voiceAgents, setVoiceAgents] = useState([]);
-  const [stats, setStats] = useState({
-    activeAgents: 0,
-    totalCalls: 0,
-    successRate: 94.2
-  });
-  const [assistantData, setAssistantData] = useState({
-    name: '',
-    voice: 'Mark',
-    language: 'English',
-    temperature: '0.3',
-    maxDuration: '180',
-    systemPrompt: '',
-    documents: null
-  });
+  const navigate = useNavigate();
+  const [isCallActive, setIsCallActive] = useState(false);
+  const [callStatus, setCallStatus] = useState('Ready to call');
+  const [isMuted, setIsMuted] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const vapiInstanceRef = useRef(null);
 
-  // Load voice agents on component mount
+  // Your VAPI credentials
+  const VAPI_API_KEY = '27212012-b4a1-4792-abd5-79033b637907';
+  const VAPI_ASSISTANT_ID = '9b33243a-6af2-44f4-a9d2-eedeb9615561';
+
+  const addMessage = (role, text) => {
+    setMessages(prev => [...prev, { role, text, timestamp: new Date() }]);
+  };
+
   useEffect(() => {
-    loadVoiceAgents();
+    // Initialize VAPI with npm package
+    console.log('🔧 Initializing VAPI...');
+    
+    try {
+      vapiInstanceRef.current = new Vapi(VAPI_API_KEY);
+
+      // Event listeners
+      vapiInstanceRef.current.on('call-start', () => {
+        console.log('Call started');
+        setIsCallActive(true);
+        setCallStatus('Connected - Speaking with Rai');
+        addMessage('system', 'Call connected. Rai is ready to help you!');
+      });
+
+      vapiInstanceRef.current.on('call-end', () => {
+        console.log('Call ended');
+        setIsCallActive(false);
+        setCallStatus('Call ended');
+        addMessage('system', 'Call ended. Thank you for using our service!');
+      });
+
+      vapiInstanceRef.current.on('speech-start', () => {
+        console.log('User started speaking');
+        setCallStatus('Listening...');
+      });
+
+      vapiInstanceRef.current.on('speech-end', () => {
+        console.log('User stopped speaking');
+        setCallStatus('Processing...');
+      });
+
+      vapiInstanceRef.current.on('message', (message) => {
+        console.log('Message:', message);
+        
+        if (message.type === 'transcript' && message.transcriptType === 'final') {
+          if (message.role === 'user') {
+            addMessage('user', message.transcript);
+          } else if (message.role === 'assistant') {
+            addMessage('assistant', message.transcript);
+            setCallStatus('Connected - Speaking with Rai');
+          }
+        }
+      });
+
+      vapiInstanceRef.current.on('error', (error) => {
+        console.error('VAPI Error:', error);
+        setCallStatus('Error: ' + error.message);
+        addMessage('system', 'Error: ' + error.message);
+      });
+
+      console.log('✅ VAPI initialized successfully');
+      setCallStatus('Ready to call');
+    } catch (error) {
+      console.error('❌ Error initializing VAPI:', error);
+      setCallStatus('Failed to initialize');
+    }
+
+    return () => {
+      if (vapiInstanceRef.current) {
+        try {
+          vapiInstanceRef.current.stop();
+        } catch (e) {
+          console.error('Error stopping call:', e);
+        }
+      }
+    };
   }, []);
 
-  const loadVoiceAgents = async () => {
+  const startCall = async () => {
     try {
-      const token = await getToken();
-      const response = await voiceAgentAPI.getAll(token);
+      console.log('🔵 Starting call...');
       
-      if (response.success) {
-        setVoiceAgents(response.assistants);
-        setStats({
-          activeAgents: response.assistants.length,
-          totalCalls: response.assistants.reduce((sum, agent) => sum + (agent.totalCalls || 0), 0),
-          successRate: 94.2
-        });
+      if (!vapiInstanceRef.current) {
+        const errorMsg = 'VAPI SDK not loaded yet. Please refresh the page and try again.';
+        console.error('❌', errorMsg);
+        alert(errorMsg);
+        setCallStatus('SDK not ready');
+        return;
       }
+
+      setCallStatus('Connecting...');
+      addMessage('system', 'Initiating call to Rai...');
+
+      console.log('📞 Calling assistant:', VAPI_ASSISTANT_ID);
+      await vapiInstanceRef.current.start(VAPI_ASSISTANT_ID);
+      console.log('✅ Call started successfully');
     } catch (error) {
-      console.error('Failed to load voice agents:', error);
+      console.error('❌ Error starting call:', error);
+      setCallStatus('Failed to connect');
+      addMessage('system', 'Failed to start call: ' + error.message);
+      alert('Failed to start call: ' + error.message);
     }
   };
 
-  const handleCreateAssistant = async () => {
-    if (!assistantData.name || !assistantData.systemPrompt) {
-      alert('Please fill in the required fields (Name and System Prompt)');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const token = await getToken();
-      
-      // Convert the form data to match the API
-      const voiceAgentData = {
-        name: assistantData.name,
-        type: 'voice-assistant',
-        description: assistantData.systemPrompt,
-        systemPrompt: assistantData.systemPrompt,
-        voiceId: assistantData.voice.toLowerCase(),
-        firstMessage: `Hello! I'm ${assistantData.name}, how can I help you today?`,
-        endCallMessage: 'Thank you for calling. Have a great day!'
-      };
-      
-      const response = await voiceAgentAPI.create(token, voiceAgentData);
-      
-      if (response.success) {
-        alert('🎉 Voice Agent created successfully! Your AI assistant is ready to handle calls.');
-        setShowCreateForm(false);
-        setAssistantData({
-          name: '',
-          voice: 'Mark',
-          language: 'English',
-          temperature: '0.3',
-          maxDuration: '180',
-          systemPrompt: '',
-          documents: null
-        });
-        loadVoiceAgents(); // Reload the list
-      }
-    } catch (error) {
-      console.error('Voice agent creation error:', error);
-      alert(`Failed to create voice agent: ${error.message}`);
-    } finally {
-      setLoading(false);
+  const endCall = () => {
+    if (vapiInstanceRef.current && isCallActive) {
+      vapiInstanceRef.current.stop();
+      setIsCallActive(false);
+      setCallStatus('Ready to call');
     }
   };
 
-  const handleFileUpload = (event) => {
-    const files = event.target.files;
-    setAssistantData({...assistantData, documents: files});
+  const toggleMute = () => {
+    if (vapiInstanceRef.current && isCallActive) {
+      const newMutedState = !isMuted;
+      vapiInstanceRef.current.setMuted(newMutedState);
+      setIsMuted(newMutedState);
+      addMessage('system', newMutedState ? 'Microphone muted' : 'Microphone unmuted');
+    }
   };
 
   return (
-    <div className="content-generator">
-      <div className="page-header">
-        <div className="header-icon">
-          <i className="fas fa-microphone"></i>
+    <div className="content-generator-page">
+      {/* Header */}
+      <div className="dashboard-header">
+        <div>
+          <h1>Voice Calling Agent</h1>
+          <p>Talk to Rai - Your AI Customer Support Assistant</p>
         </div>
-        <div className="header-content">
-          <h1>Voice <span className="gradient-text">Agent</span></h1>
-          <p>Create AI assistants that can make phone calls to your customers</p>
-        </div>
-        <button 
-          className="create-assistant-btn"
-          onClick={() => setShowCreateForm(true)}
-        >
-          <i className="fas fa-plus"></i>
-          Create Assistant
+        <button className="btn-secondary" onClick={() => navigate('/admin')}>
+          <i className="fas fa-arrow-left"></i> Back
         </button>
       </div>
 
-      <div className="container">
-        {/* Stats Cards */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-header">
-              <h3>Assistants</h3>
+      {/* Main Call Interface */}
+      <div className="content-type-selection">
+        <div className="content-types-grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+          
+          {/* Call Controls */}
+          <div className="content-type-card" style={{ height: '500px' }}>
+            <div className="type-image" style={{
+              height: '200px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: isCallActive 
+                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' 
+                : 'linear-gradient(135deg, #6e40ff 0%, #5530c7 100%)'
+            }}>
+              <div style={{
+                width: '100px',
+                height: '100px',
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                animation: isCallActive ? 'pulse 2s infinite' : 'none'
+              }}>
+                <i className={`fas ${isCallActive ? 'fa-phone' : 'fa-phone-alt'}`} style={{
+                  fontSize: '48px',
+                  color: 'white'
+                }}></i>
+              </div>
             </div>
-            <div className="stat-value">{stats.activeAgents}</div>
-            <div className="stat-label">AI voice agents created</div>
-          </div>
-              
-              <div className="stat-card">
-                <div className="stat-header">
-                  <h3>Total Calls</h3>
+
+            <div className="type-info" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <h3 style={{ marginBottom: '15px' }}>
+                  <i className="fas fa-robot"></i> Rai - Customer Support
+                </h3>
+                <div style={{
+                  padding: '15px',
+                  background: 'rgba(110, 64, 255, 0.1)',
+                  borderRadius: '12px',
+                  marginBottom: '20px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                    <i className={`fas fa-circle`} style={{
+                      fontSize: '10px',
+                      color: isCallActive ? '#10b981' : '#ef4444'
+                    }}></i>
+                    <span style={{ fontWeight: 600 }}>{callStatus}</span>
+                  </div>
+                  <p style={{ fontSize: '0.85rem', opacity: 0.8, margin: 0 }}>
+                    {isCallActive 
+                      ? 'Speak naturally. Rai is listening and will respond.'
+                      : 'Click "Start Call" to talk with Rai'
+                    }
+                  </p>
                 </div>
-                <div className="stat-value">{stats.totalCalls}</div>
-                <div className="stat-label">Made with your assistants</div>
               </div>
-              
-              <div className="stat-card">
-                <div className="stat-header">
-                  <h3>Success Rate</h3>
-                </div>
-                <div className="stat-value">{stats.successRate}%</div>
-                <div className="stat-label">Call completion rate</div>
-              </div>
-            </div>
 
-            {/* Action Tabs */}
-            <div className="action-tabs">
-              <button className="tab-btn active">
-                <i className="fas fa-robot"></i>
-                Assistants
-              </button>
-              <button className="tab-btn">
-                <i className="fas fa-bullhorn"></i>
-                Campaigns
-              </button>
-              <button className="tab-btn">
-                <i className="fas fa-history"></i>
-                Call History
-              </button>
-            </div>
-
-            {/* Empty State */}
-            <div className="empty-state">
-              <div className="empty-icon">
-                <i className="fas fa-robot"></i>
-              </div>
-              <h2>No Voice Assistants Yet</h2>
-              <p>Create your first AI voice assistant to start making automated calls to your customers.</p>
-              <button 
-                className="create-first-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowCreateForm(true);
-                }}
-              >
-                <i className="fas fa-plus"></i>
-                Create Your First Assistant
-              </button>
-            </div>
-          </div>
-
-          {/* Modal Overlay - Always present but conditionally visible */}
-          {showCreateForm && (
-            <div className="modal-overlay" onClick={() => setShowCreateForm(false)}>
-              <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-              {/* Create Assistant Form */}
-              <div className="create-form-container">
-                <div className="form-header">
-                  <h2>
-                    <i className="fas fa-microphone"></i>
-                    Create Voice Assistant
-                  </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {!isCallActive ? (
                   <button 
-                    className="close-btn"
-                    onClick={() => setShowCreateForm(false)}
+                    className="btn-primary btn-full"
+                    onClick={startCall}
+                    style={{ padding: '15px' }}
                   >
-                    <i className="fas fa-times"></i>
+                    <i className="fas fa-phone"></i> Start Call
                   </button>
-                </div>
-
-              <div className="form-content">
-                <div className="form-section">
-                  <div className="form-row">
-                    <div className="form-group half">
-                      <label>Assistant Name*</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Sales Assistant"
-                        value={assistantData.name}
-                        onChange={(e) => setAssistantData({...assistantData, name: e.target.value})}
-                      />
-                    </div>
-                    <div className="form-group half">
-                      <label>Voice</label>
-                      <select
-                        value={assistantData.voice}
-                        onChange={(e) => setAssistantData({...assistantData, voice: e.target.value})}
-                      >
-                        <option value="Mark">Mark</option>
-                        <option value="Sarah">Sarah</option>
-                        <option value="David">David</option>
-                        <option value="Emma">Emma</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="form-row">
-                    <div className="form-group half">
-                      <label>Language</label>
-                      <select
-                        value={assistantData.language}
-                        onChange={(e) => setAssistantData({...assistantData, language: e.target.value})}
-                      >
-                        <option value="English">English</option>
-                        <option value="Spanish">Spanish</option>
-                        <option value="French">French</option>
-                        <option value="German">German</option>
-                      </select>
-                    </div>
-                    <div className="form-group half">
-                      <label>Who Speaks First</label>
-                      <select defaultValue="Assistant">
-                        <option value="Assistant">Assistant</option>
-                        <option value="Customer">Customer</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="form-row">
-                    <div className="form-group half">
-                      <label>Temperature (0-1)</label>
-                      <input
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="1"
-                        value={assistantData.temperature}
-                        onChange={(e) => setAssistantData({...assistantData, temperature: e.target.value})}
-                      />
-                    </div>
-                    <div className="form-group half">
-                      <label>Maximum Call Duration (seconds)</label>
-                      <input
-                        type="number"
-                        value={assistantData.maxDuration}
-                        onChange={(e) => setAssistantData({...assistantData, maxDuration: e.target.value})}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>System Prompt*</label>
-                    <textarea
-                      rows="6"
-                      placeholder="How should your assistant behave? What information should it provide?"
-                      value={assistantData.systemPrompt}
-                      onChange={(e) => setAssistantData({...assistantData, systemPrompt: e.target.value})}
-                    ></textarea>
-                    <div className="form-hint">
-                      <i className="fas fa-info-circle"></i>
-                      This prompt guides how your assistant will speak with customers.
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Upload Documents with Phone Numbers*</label>
-                    <div className="file-upload-area">
-                      <input
-                        type="file"
-                        id="documents"
-                        multiple
-                        accept=".pdf,.docx,.csv"
-                        onChange={handleFileUpload}
-                        style={{display: 'none'}}
-                      />
-                      <label htmlFor="documents" className="file-upload-label">
-                        <i className="fas fa-upload"></i>
-                        <span>Drag & drop files here, or click to select</span>
-                        <div className="supported-formats">Supported formats: PDF, DOCX, CSV</div>
-                      </label>
-                    </div>
-                    <div className="form-hint">
-                      <i className="fas fa-info-circle"></i>
-                      Upload PDF, DOCX, or CSV files containing phone numbers and context for the assistant. The system will automatically extract numbers to call.
-                    </div>
-                  </div>
-
-                  <div className="form-row">
-                    <div className="form-group half">
-                      <label>Call Schedule</label>
-                      <select>
-                        <option value="immediate">Start Immediately</option>
-                        <option value="scheduled">Schedule for Later</option>
-                        <option value="recurring">Recurring Calls</option>
-                      </select>
-                    </div>
-
-                    <div className="form-group half">
-                      <label>Time Zone</label>
-                      <select>
-                        <option value="EST">Eastern Time (EST)</option>
-                        <option value="CST">Central Time (CST)</option>
-                        <option value="MST">Mountain Time (MST)</option>
-                        <option value="PST">Pacific Time (PST)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="form-row">
-                    <div className="form-group half">
-                      <label>Max Retries</label>
-                      <input
-                        type="number"
-                        placeholder="3"
-                        min="0"
-                        max="10"
-                      />
-                    </div>
-
-                    <div className="form-group half">
-                      <label>Retry Delay (hours)</label>
-                      <input
-                        type="number"
-                        placeholder="2"
-                        min="1"
-                        max="24"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Advanced Settings</label>
-                    <textarea
-                      rows="3"
-                      placeholder="Additional configuration options, webhook URLs, or custom parameters..."
-                    ></textarea>
-                    <div className="form-hint">
-                      <i className="fas fa-info-circle"></i>
-                      Configure advanced options like webhooks, custom parameters, or integration settings.
-                    </div>
-                  </div>
-
-                  <button className="create-btn" onClick={handleCreateAssistant} disabled={loading}>
-                    <i className="fas fa-plus"></i>
-                    {loading ? 'Creating...' : 'Create Assistant'}
-                  </button>
-                </div>
+                ) : (
+                  <>
+                    <button 
+                      className="btn-secondary btn-full"
+                      onClick={toggleMute}
+                      style={{ padding: '12px' }}
+                    >
+                      <i className={`fas ${isMuted ? 'fa-microphone-slash' : 'fa-microphone'}`}></i>
+                      {isMuted ? 'Unmute' : 'Mute'}
+                    </button>
+                    <button 
+                      className="btn-primary btn-full"
+                      onClick={endCall}
+                      style={{ 
+                        padding: '15px',
+                        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'
+                      }}
+                    >
+                      <i className="fas fa-phone-slash"></i> End Call
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
+
+          {/* Live Transcript */}
+          <div className="content-type-card" style={{ height: '500px' }}>
+            <div className="type-image" style={{
+              height: '60px',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '0 20px',
+              background: 'linear-gradient(135deg, #1a1c24 0%, #252836 100%)'
+            }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem' }}>
+                <i className="fas fa-comments"></i> Live Transcript
+              </h3>
+            </div>
+
+            <div style={{
+              flex: 1,
+              padding: '20px',
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px'
+            }}>
+              {messages.length === 0 ? (
+                <div style={{
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: 0.5,
+                  textAlign: 'center'
+                }}>
+                  <div>
+                    <i className="fas fa-comment-dots" style={{ fontSize: '48px', marginBottom: '15px', opacity: 0.3 }}></i>
+                    <p>Call transcript will appear here</p>
+                  </div>
+                </div>
+              ) : (
+                messages.map((msg, idx) => (
+                  <div 
+                    key={idx}
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: '12px',
+                      background: msg.role === 'user' 
+                        ? 'rgba(110, 64, 255, 0.2)'
+                        : msg.role === 'assistant'
+                        ? 'rgba(16, 185, 129, 0.2)'
+                        : 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid ' + (
+                        msg.role === 'user' 
+                          ? 'rgba(110, 64, 255, 0.3)'
+                          : msg.role === 'assistant'
+                          ? 'rgba(16, 185, 129, 0.3)'
+                          : 'rgba(255, 255, 255, 0.1)'
+                      )
+                    }}
+                  >
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '8px',
+                      marginBottom: '6px'
+                    }}>
+                      <i className={`fas ${
+                        msg.role === 'user' ? 'fa-user' :
+                        msg.role === 'assistant' ? 'fa-robot' :
+                        'fa-info-circle'
+                      }`} style={{ fontSize: '12px', opacity: 0.7 }}></i>
+                      <span style={{ 
+                        fontSize: '0.75rem', 
+                        fontWeight: 600,
+                        textTransform: 'capitalize',
+                        opacity: 0.7
+                      }}>
+                        {msg.role === 'assistant' ? 'Rai' : msg.role}
+                      </span>
+                      <span style={{ 
+                        fontSize: '0.7rem', 
+                        opacity: 0.5,
+                        marginLeft: 'auto'
+                      }}>
+                        {msg.timestamp.toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <p style={{ 
+                      margin: 0, 
+                      fontSize: '0.9rem',
+                      lineHeight: 1.5
+                    }}>
+                      {msg.text}
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-      )}
+
+      {/* Assistant Info */}
+      <div className="content-type-selection">
+        <h2><i className="fas fa-info-circle"></i> About Rai</h2>
+        <div className="content-types-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+          <div className="content-type-card">
+            <div className="type-image" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #1a1c24 0%, #252836 100%)'
+            }}>
+              <i className="fas fa-brain fa-3x" style={{ color: '#6e40ff' }}></i>
+            </div>
+            <div className="type-info">
+              <h3>Powered by GPT-4o Mini</h3>
+              <p>Advanced AI model for natural conversations and intelligent responses</p>
+            </div>
+          </div>
+
+          <div className="content-type-card">
+            <div className="type-image" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #1a1c24 0%, #252836 100%)'
+            }}>
+              <i className="fas fa-microphone fa-3x" style={{ color: '#6e40ff' }}></i>
+            </div>
+            <div className="type-info">
+              <h3>Deepgram Voice</h3>
+              <p>High-quality voice synthesis with Luna voice model for natural speech</p>
+            </div>
+          </div>
+
+          <div className="content-type-card">
+            <div className="type-image" style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #1a1c24 0%, #252836 100%)'
+            }}>
+              <i className="fas fa-headset fa-3x" style={{ color: '#6e40ff' }}></i>
+            </div>
+            <div className="type-info">
+              <h3>Customer Support</h3>
+              <p>Trained specifically for TechSolutions customer service and support queries</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% {
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+          }
+          50% {
+            box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+          }
+        }
+      `}</style>
     </div>
   );
 };
+
 export default VoiceAgent;

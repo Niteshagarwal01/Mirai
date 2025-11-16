@@ -1,5 +1,8 @@
-
 import Razorpay from 'razorpay';
+import dotenv from 'dotenv';
+
+// Ensure environment variables are loaded
+dotenv.config();
 
 if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
   throw new Error('RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET are required');

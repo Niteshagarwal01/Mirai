@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useUser, useAuth } from '@clerk/clerk-react';
+import { useAuth, useUser } from '@clerk/clerk-react';
 import '../css/payment-page.css';
 import DebugEnv from '../components/DebugEnv';
 import { API_BASE_URL } from '../config/production';
@@ -19,8 +19,8 @@ const loadRazorpayScript = () => {
 const PaymentPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isSignedIn, user } = useUser();
-  const { getToken } = useAuth();
+  const { isSignedIn, getToken } = useAuth();
+  const { user } = useUser();
   const [loading, setLoading] = useState(false);
   
   // Get selected plan from navigation state
@@ -103,17 +103,17 @@ const PaymentPage = () => {
       }
       console.log('Razorpay script loaded successfully');
 
-      // Get user data from Clerk
-      const email = user?.primaryEmailAddress?.emailAddress || '';
-      const clerkUserId = user?.id || '';
+      // Get user data from Parse
+      const email = user?.get('email') || '';
+      const userId = user?.id || '';
       console.log('User email:', email);
-      console.log('Clerk User ID:', clerkUserId);
+      console.log('User ID:', userId);
 
-      // Get Clerk session token using useAuth hook
+      // Get Parse session token
       let token = null;
       try {
         token = await getToken();
-        console.log('Got Clerk token successfully');
+        console.log('Got Parse session token successfully');
       } catch (tokenError) {
         console.error('Token retrieval error:', tokenError);
         alert('Authentication error. Please sign in again.');
@@ -122,8 +122,7 @@ const PaymentPage = () => {
         return;
       }
 
-      console.log('Got Clerk token');
-      console.log('Got Clerk token');
+      console.log('Got session token');
 
       // Create order from backend
       const API_URL = API_BASE_URL;
@@ -199,7 +198,7 @@ const PaymentPage = () => {
                 razorpay_order_id: razorpayResponse.razorpay_order_id,
                 razorpay_payment_id: razorpayResponse.razorpay_payment_id,
                 razorpay_signature: razorpayResponse.razorpay_signature,
-                clerkUserId: clerkUserId,
+                userId: userId,
                 email: email
               })
             });
@@ -229,7 +228,7 @@ const PaymentPage = () => {
         },
         prefill: {
           email: email,
-          name: user?.fullName || ''
+          name: user?.get('firstName') || user?.get('username') || ''
         },
         theme: {
           color: '#6e40ff'

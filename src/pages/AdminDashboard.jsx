@@ -67,35 +67,36 @@ const AdminDashboard = () => {
         
         // Use demo data as fallback
         setDashboardData({
-          userCount: 2,
-          activeUsers: 2,
-          campaigns: 4,
+          mediaGenerated: 15,
+          contentPosts: 42,
+          campaigns: 8,
+          voiceCalls: 127,
+          chatbotMessages: 856,
           engagementRate: '4.7%',
-          revenue: '$12,450',
           topContent: [
             {
               id: 1,
-              title: '10 AI Marketing Strategies for 2025',
-              date: 'May 1, 2025',
-              views: 24,
-              engagement: '78%',
-              icon: 'file-alt'
+              title: 'AI Generated Product Photos',
+              date: 'Nov 14, 2025',
+              views: 324,
+              engagement: '89%',
+              icon: 'images'
             },
             {
               id: 2,
-              title: 'Product Launch Campaign Analysis',
-              date: 'April 28, 2025',
-              views: 18,
-              engagement: '65%',
-              icon: 'chart-bar'
+              title: 'Social Media Campaign - Black Friday',
+              date: 'Nov 12, 2025',
+              views: 458,
+              engagement: '76%',
+              icon: 'pen-fancy'
             },
             {
               id: 3,
-              title: 'Summer Collection Email Campaign',
-              date: 'April 25, 2025',
-              views: 32,
+              title: 'Welcome Email Automation Series',
+              date: 'Nov 10, 2025',
+              views: 892,
               engagement: '81%',
-              icon: 'bolt'
+              icon: 'envelope-open-text'
             }
           ],
           recommendations: [
@@ -194,59 +195,31 @@ const AdminDashboard = () => {
               </Link>
             </li>
             
-            <li className={`menu-item ${location.pathname.includes('/admin/content') ? 'active' : ''}`}>
-              <Link to="/admin/content">
-                <i className="fas fa-file-alt"></i>
-                <span>Content Generator</span>
+            <li className={`menu-item ${location.pathname.includes('/admin/media-studio') ? 'active' : ''}`}>
+              <Link to="/admin/media-studio">
+                <i className="fas fa-images"></i>
+                <span>AI Media Studio</span>
               </Link>
             </li>
             
-            <li className={`menu-item ${location.pathname.includes('/admin/ai-videoshoot') ? 'active' : ''}`}>
-              <Link to="/admin/ai-videoshoot">
-                <i className="fas fa-video"></i>
-                <span>AI VideoShoot</span>
+            <li className={`menu-item ${location.pathname.includes('/admin/content-creator') ? 'active' : ''}`}>
+              <Link to="/admin/content-creator">
+                <i className="fas fa-pen-fancy"></i>
+                <span>Content Creator</span>
               </Link>
             </li>
             
-            <li className={`menu-item ${location.pathname.includes('/admin/ai-photoshoot') ? 'active' : ''}`}>
-              <Link to="/admin/ai-photoshoot">
-                <i className="fas fa-image"></i>
-                <span>AI Photoshoot</span>
+            <li className={`menu-item ${location.pathname.includes('/admin/email-engine') ? 'active' : ''}`}>
+              <Link to="/admin/email-engine">
+                <i className="fas fa-envelope-open-text"></i>
+                <span>Email Marketing Engine</span>
               </Link>
             </li>
             
             <li className={`menu-item ${location.pathname.includes('/admin/voice-agent') ? 'active' : ''}`}>
               <Link to="/admin/voice-agent">
-                <i className="fas fa-comment-alt"></i>
-                <span>Voice Agent</span>
-              </Link>
-            </li>
-            
-            <li className={`menu-item ${location.pathname.includes('/admin/chatbot') ? 'active' : ''}`}>
-              <Link to="/admin/chatbot">
-                <i className="fas fa-robot"></i>
-                <span>AI Chatbot</span>
-              </Link>
-            </li>
-            
-            <li className={`menu-item ${location.pathname.includes('/admin/email-marketing') ? 'active' : ''}`}>
-              <Link to="/admin/email-marketing">
-                <i className="fas fa-envelope"></i>
-                <span>Email Marketing</span>
-              </Link>
-            </li>
-            
-            <li className={`menu-item ${location.pathname.includes('/admin/business-planner') ? 'active' : ''}`}>
-              <Link to="/admin/business-planner">
-                <i className="fas fa-calendar-alt"></i>
-                <span>Business Planner</span>
-              </Link>
-            </li>
-            
-            <li className={`menu-item ${location.pathname.includes('/admin/settings') ? 'active' : ''}`}>
-              <Link to="/admin/settings">
-                <i className="fas fa-cog"></i>
-                <span>Settings</span>
+                <i className="fas fa-phone-volume"></i>
+                <span>Voice Calling Agent</span>
               </Link>
             </li>
           </ul>
@@ -271,15 +244,11 @@ const AdminDashboard = () => {
       
       {/* Main Content Area */}
       <div className="admin-main-content">
-        {/* Hide the Command Center header when on Content Generator, Business Planner, or other feature routes */}
-        {!location.pathname.includes('/admin/content') && 
-         !location.pathname.includes('/admin/business-planner') && 
-         !location.pathname.includes('/admin/email-marketing') && 
-         !location.pathname.includes('/admin/voice-agent') && 
-         !location.pathname.includes('/admin/chatbot') && 
-         !location.pathname.includes('/admin/ai-photoshoot') && 
-         !location.pathname.includes('/admin/ai-videoshoot') && 
-         !location.pathname.includes('/admin/settings') && (
+        {/* Hide the Command Center header when on feature routes */}
+        {!location.pathname.includes('/admin/media-studio') && 
+         !location.pathname.includes('/admin/content-creator') && 
+         !location.pathname.includes('/admin/email-engine') && 
+         !location.pathname.includes('/admin/voice-agent') && (
           <div className="admin-header">
             <div className="header-title">
               <div className="title-icon">
@@ -315,21 +284,33 @@ const AdminDashboard = () => {
                 {/* Stats Cards Row */}
                 <div className="stats-grid">
                   <div className="stat-card">
-                    <h3>Total Users</h3>
-                    <div className="stat-value">{dashboardData.userCount || 2}</div>
-                    <div className="stat-icon"><i className="fas fa-users"></i></div>
+                    <h3>Media Generated</h3>
+                    <div className="stat-value">{dashboardData.mediaGenerated || 15}</div>
+                    <div className="stat-icon"><i className="fas fa-images"></i></div>
                   </div>
                   
                   <div className="stat-card">
-                    <h3>Active Users</h3>
-                    <div className="stat-value">{dashboardData.activeUsers || 2}</div>
-                    <div className="stat-icon"><i className="fas fa-user-check"></i></div>
+                    <h3>Content Posts</h3>
+                    <div className="stat-value">{dashboardData.contentPosts || 42}</div>
+                    <div className="stat-icon"><i className="fas fa-pen-fancy"></i></div>
                   </div>
                   
                   <div className="stat-card">
-                    <h3>Campaigns</h3>
-                    <div className="stat-value">{dashboardData.campaigns || 4}</div>
+                    <h3>Active Campaigns</h3>
+                    <div className="stat-value">{dashboardData.campaigns || 8}</div>
                     <div className="stat-icon"><i className="fas fa-bullhorn"></i></div>
+                  </div>
+                  
+                  <div className="stat-card">
+                    <h3>Voice Calls</h3>
+                    <div className="stat-value">{dashboardData.voiceCalls || 127}</div>
+                    <div className="stat-icon"><i className="fas fa-phone-volume"></i></div>
+                  </div>
+                  
+                  <div className="stat-card">
+                    <h3>Chatbot Messages</h3>
+                    <div className="stat-value">{dashboardData.chatbotMessages || 856}</div>
+                    <div className="stat-icon"><i className="fas fa-comments"></i></div>
                   </div>
                 </div>
                   {/* Top Row with Content and Recommendations Side by Side */}
@@ -403,85 +384,49 @@ const AdminDashboard = () => {
                 </div>
                   {/* AI Tools Grid */}
                 <div className="dashboard-section">
-                  <h2 className="section-title">AI Tools</h2>
+                  <h2 className="section-title">AI Marketing Suite</h2>
                     <div className="ai-tools-grid">
-                    {/* Active Tools First */}
-                    <Link to="/admin/content" className="ai-tool-card">
-                      <div className="tool-icon content-tool">
-                        <i className="fas fa-magic"></i>
-                      </div>
-                      <div className="tool-label">
-                        <div className="tool-info">
-                          <h3>Content Generator</h3>
-                          <p>Create blogs, social posts and marketing materials</p>
-                        </div>
-                      </div>
-                    </Link>
-                    
-                    <Link to="/admin/business-planner" className="ai-tool-card">
-                      <div className="tool-icon plan-tool">
-                        <i className="fas fa-calendar-alt"></i>
-                      </div>
-                      <div className="tool-label">
-                        <div className="tool-tag">AI TOOL</div>
-                        <h3>Business Planner</h3>
-                        <p>Generate comprehensive business plans with AI</p>
-                      </div>
-                    </Link>
-                    
-                    {/* Other Tools */}
-                    <Link to="/admin/email-marketing" className="ai-tool-card">
-                      <div className="tool-icon email-tool">
-                        <i className="fas fa-envelope"></i>
-                      </div>
-                      <div className="tool-label">
-                        <div className="tool-tag">AI TOOL</div>
-                        <h3>Email Marketing</h3>
-                        <p>Smart email automation with AI-powered templates</p>
-                      </div>
-                    </Link>
-                    
-                    <Link to="/admin/ai-photoshoot" className="ai-tool-card">
+                    <Link to="/admin/media-studio" className="ai-tool-card">
                       <div className="tool-icon image-tool">
-                        <i className="fas fa-image"></i>
+                        <i className="fas fa-images"></i>
                       </div>
                       <div className="tool-label">
                         <div className="tool-tag">AI TOOL</div>
-                        <h3>AI Photoshoot</h3>
-                        <p>Transform regular photos into professional marketing images</p>
+                        <h3>AI Media Studio</h3>
+                        <p>Generate professional AI photos and videos for marketing</p>
+                      </div>
+                    </Link>
+                    
+                    <Link to="/admin/content-creator" className="ai-tool-card">
+                      <div className="tool-icon content-tool">
+                        <i className="fas fa-pen-fancy"></i>
+                      </div>
+                      <div className="tool-label">
+                        <div className="tool-tag">AI TOOL</div>
+                        <h3>Content Creator</h3>
+                        <p>Create engaging social media posts and marketing content</p>
+                      </div>
+                    </Link>
+                    
+                    <Link to="/admin/email-engine" className="ai-tool-card">
+                      <div className="tool-icon email-tool">
+                        <i className="fas fa-envelope-open-text"></i>
+                      </div>
+                      <div className="tool-label">
+                        <div className="tool-tag">AI TOOL</div>
+                        <h3>Email Marketing Engine</h3>
+                        <p>Automated email campaigns with AI optimization</p>
                       </div>
                     </Link>
                     
                     <Link to="/admin/voice-agent" className="ai-tool-card">
                       <div className="tool-icon voice-tool">
-                        <i className="fas fa-microphone-alt"></i>
+                        <i className="fas fa-phone-volume"></i>
                       </div>
                       <div className="tool-label">
                         <div className="tool-tag">AI TOOL</div>
-                        <h3>Voice Agent</h3>
-                        <p>Configure AI phone agents to handle customer calls</p>
-                      </div>
-                    </Link>
-                    
-                    <Link to="/admin/chatbot" className="ai-tool-card">
-                      <div className="tool-icon chatbot-tool">
-                        <i className="fas fa-robot"></i>
-                      </div>
-                      <div className="tool-label">
-                        <div className="tool-tag">AI TOOL</div>
-                        <h3>AI Chatbot</h3>
-                        <p>Create intelligent chatbots for customer support and engagement</p>
-                      </div>
-                    </Link>
-                    
-                    <Link to="/admin/ai-videoshoot" className="ai-tool-card">
-                      <div className="tool-icon video-tool">
-                        <i className="fas fa-video"></i>
-                      </div>
-                      <div className="tool-label">
-                        <div className="tool-tag">AI TOOL</div>
-                        <h3>AI VideoShoot</h3>
-                        <p>Create professional video content with AI assistance</p>
+                        <h3>Voice Calling Agent</h3>
+                        <p>AI-powered voice agents for calls and lead qualification</p>
                       </div>
                     </Link>
                   </div>
