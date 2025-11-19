@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
-import API_BASE_URL from '../config/api';
 import '../css/content-generator.css';
 
 
@@ -96,7 +95,7 @@ const ContentCreator = () => {
     // Fetch content types from backend
     const fetchContentTypes = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/content/types`);
+        const response = await fetch('http://localhost:3001/api/content/types');
         const data = await response.json();
         
         if (data.success && data.contentTypes) {
@@ -263,7 +262,7 @@ const ContentCreator = () => {
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/content/generate`, {
+      const response = await fetch('http://localhost:3001/api/content/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

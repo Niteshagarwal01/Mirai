@@ -103,17 +103,17 @@ const PaymentPage = () => {
       }
       console.log('Razorpay script loaded successfully');
 
-      // Get user data from Parse
-      const email = user?.get('email') || '';
-      const userId = user?.id || '';
+      // Get user data from Clerk
+      const email = user?.primaryEmailAddress?.emailAddress || '';
+      const clerkUserId = user?.id || '';
       console.log('User email:', email);
-      console.log('User ID:', userId);
+      console.log('Clerk User ID:', clerkUserId);
 
-      // Get Parse session token
+      // Get Clerk session token
       let token = null;
       try {
         token = await getToken();
-        console.log('Got Parse session token successfully');
+        console.log('Got Clerk session token successfully');
       } catch (tokenError) {
         console.error('Token retrieval error:', tokenError);
         alert('Authentication error. Please sign in again.');
@@ -228,7 +228,7 @@ const PaymentPage = () => {
         },
         prefill: {
           email: email,
-          name: user?.get('firstName') || user?.get('username') || ''
+          name: user?.firstName || user?.fullName || user?.username || ''
         },
         theme: {
           color: '#6e40ff'

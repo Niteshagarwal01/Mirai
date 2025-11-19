@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
-import API_BASE_URL from '../config/api';
 import '../css/media-studio.css';
 
 const MediaStudio = () => {
@@ -32,7 +31,7 @@ const MediaStudio = () => {
       formData.append('prompt', prompt);
       formData.append('productImage', uploadedImage);
 
-      const response = await fetch(`${API_BASE_URL}/api/photoshoot/generate`, {
+      const response = await fetch('http://localhost:3001/api/photoshoot/generate', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

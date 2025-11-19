@@ -13,6 +13,20 @@ class VapiService {
   // Create a new voice assistant
   async createVoiceAssistant(assistantData) {
     try {
+      // Support both old and new data formats
+      const modelConfig = assistantData.model || {
+        provider: 'openai',
+        model: 'gpt-3.5-turbo'
+      };
+      
+      const voiceConfig = assistantData.voice || {
+        provider: 'playht',
+        voiceId: 'jennifer'
+      };
+
+      // Ensure name is max 40 characters
+      const assistantName = (assistantData.name || 'AI Assistant').substring(0, 40);
+
       const config = {
         method: 'POST',
         url: `${this.baseUrl}/assistant`,
@@ -21,20 +35,22 @@ class VapiService {
           'Content-Type': 'application/json'
         },
         data: {
-          name: assistantData.name,
+          name: assistantName,
           model: {
-            provider: 'openai',
-            model: 'gpt-3.5-turbo',
+            provider: modelConfig.provider || 'openai',
+            model: modelConfig.model || 'gpt-4o-mini',
             temperature: 0.7,
             maxTokens: 250,
-            systemMessage: assistantData.systemPrompt || 'You are a helpful AI voice assistant.'
+            messages: [
+              {
+                role: 'system',
+                content: assistantData.systemPrompt || 'You are a helpful AI voice assistant.'
+              }
+            ]
           },
           voice: {
-            provider: 'playht',
-            voiceId: assistantData.voiceId || 'jennifer',
-            speed: 1.0,
-            stability: 0.5,
-            similarityBoost: 0.8
+            provider: voiceConfig.provider || 'deepgram',
+            voiceId: voiceConfig.voiceId || 'luna'
           },
           firstMessage: assistantData.firstMessage || 'Hi! How can I help you today?',
           recordingEnabled: true,
@@ -43,14 +59,7 @@ class VapiService {
           backgroundSound: 'office',
           backchannelingEnabled: true,
           backgroundDenoisingEnabled: true,
-          modelOutputInMessagesEnabled: true,
-          transportConfigurations: [
-            {
-              provider: 'twilio',
-              timeout: 600,
-              record: true
-            }
-          ]
+          modelOutputInMessagesEnabled: true
         }
       };
 

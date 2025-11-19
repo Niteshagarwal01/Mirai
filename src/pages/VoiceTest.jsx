@@ -10,8 +10,8 @@ const VoiceTest = () => {
   const [volumeLevel, setVolumeLevel] = useState(0);
   const vapiClientRef = useRef(null);
 
-  const VAPI_PUBLIC_KEY = '27212012-b4a1-4792-abd5-79033b637907';
-  const ASSISTANT_ID = '35ea6099-4093-4672-a972-e75818725b79';
+  const VAPI_PUBLIC_KEY = import.meta.env.VITE_VAPI_PUBLIC_KEY || '27212012-b4a1-4792-abd5-79033b637907';
+  const ASSISTANT_ID = import.meta.env.VITE_VAPI_ASSISTANT_ID || '35ea6099-4093-4672-a972-e75818725b79';
 
   useEffect(() => {
     // Initialize VAPI client

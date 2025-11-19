@@ -202,7 +202,7 @@ app.use('/api/payment', webhooksRouter); // verify route
 app.use('/api/user', userRouter);
 app.use('/api/chatbots', chatbotsRouter);
 app.use('/api/voice-agents', voiceAgentsRouter);
-app.use('/api/email-automation', emailAutomationRouter);
+// app.use('/api/email-automation', emailAutomationRouter); // Disabled
 app.use('/api/email-setup', emailSetupRouter);
 app.use('/api', contentGeneratorRouter); // Content generation endpoint (legacy)
 app.use('/api/content', contentRouter); // New content creation API (all 9 types)

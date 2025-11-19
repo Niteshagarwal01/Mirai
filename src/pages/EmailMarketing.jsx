@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
-import API_BASE_URL from '../config/api';
 import '../css/content-generator.css';
 
 const EmailMarketing = () => {
@@ -32,7 +31,7 @@ const EmailMarketing = () => {
 
     try {
       const token = await getToken();
-      const response = await fetch(`${API_BASE_URL}/api/email-setup/request`, {
+      const response = await fetch('http://localhost:3001/api/email-setup/request', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
