@@ -5,6 +5,7 @@ Next.js, Python, LangGraph, n8n, VAPI, Chatbase, Google Cloud | 12+ API Integrat
 
 ## 🌟 Overview
 
+
 **Flagship Project**: Among 10+ AI and full-stack projects, Mirai stands out as a highly flexible, end-to-end automation system designed to redefine marketing workflows.
 
 Developed an AI-powered marketing automation platform integrating 12+ APIs to streamline digital marketing operations. The system features an Ultimate Agent for Content Creation (in progress) for automating social media posts, photoshoots, and video campaigns, along with smart chatbot agents and upcoming WhatsApp automation.
